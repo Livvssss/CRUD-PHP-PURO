@@ -1,0 +1,70 @@
+services:
+    php:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+
+        container_name: biblioteca_php_puro
+
+        ports:
+            - "8090:80"
+
+        volumes:
+            - ./:/var/www/html
+
+        depends_on:
+            - mysql
+
+        networks:
+            - rede_biblioteca
+
+    mysql:
+        image: mysql:8.0
+
+        container_name: biblioteca_mysql_puro
+
+        restart: always
+
+        environment:
+            MYSQL_ROOT_PASSWORD: senha_root_123
+            MYSQL_DATABASE: biblioteca_pw
+            MYSQL_USER: usuario_app
+            MYSQL_PASSWORD: senha_app_123
+
+        volumes:
+            - dados_mysql:/var/lib/mysql
+            - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+        ports:
+            - "3308:3306"
+
+        networks:
+            - rede_biblioteca
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+
+        container_name: biblioteca_phpmyadmin_puro
+
+        restart: always
+
+        environment:
+            PMA_HOST: mysql
+            PMA_USER: root
+            PMA_PASSWORD: senha_root_123
+
+        ports:
+            - "8082:80"
+
+        depends_on:
+            - mysql
+
+        networks:
+            - rede_biblioteca
+
+volumes:
+    dados_mysql:
+
+networks:
+    rede_biblioteca:
+        driver: bridge
