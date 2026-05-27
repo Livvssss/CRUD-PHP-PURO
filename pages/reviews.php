@@ -14,24 +14,44 @@ $usuarioId = $_SESSION['usuario_id'];
 
 /*
 |--------------------------------------------------------------------------
-| CRIAR TABELA POSTS
+| CRIAR TABELA REVIEWS
 |--------------------------------------------------------------------------
 */
 
 $pdo->exec("
-    CREATE TABLE IF NOT EXISTS posts (
+    CREATE TABLE IF NOT EXISTS reviews (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        content TEXT NOT NULL,
-        image VARCHAR(255) DEFAULT NULL,
+        book_id INT NOT NULL,
+        review_title VARCHAR(255) NOT NULL,
+        review_text TEXT NOT NULL,
+        rating DECIMAL(2,1) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
 ");
 
 /*
 |--------------------------------------------------------------------------
-| CADASTRAR POST
+| LISTAR LIVROS
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+    SELECT *
+    FROM shelves
+    WHERE user_id = :user_id
+    ORDER BY title ASC
+");
+
+$stmt->execute([
+    ':user_id' => $usuarioId
+]);
+
+$books = $stmt->fetchAll();
+
+/*
+|--------------------------------------------------------------------------
+| CADASTRAR REVIEW
 |--------------------------------------------------------------------------
 */
 
@@ -40,81 +60,77 @@ $erro = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    $livroId = $_POST['livro_id'] ?? '';
     $titulo = trim($_POST['titulo'] ?? '');
-    $conteudo = trim($_POST['conteudo'] ?? '');
+    $texto = trim($_POST['texto'] ?? '');
+    $nota = $_POST['nota'] ?? null;
 
-    if (empty($titulo) || empty($conteudo)) {
+    if (
+        empty($livroId) ||
+        empty($titulo) ||
+        empty($texto)
+    ) {
 
         $erro = 'Preencha todos os campos.';
     } else {
 
-        $nomeImagem = null;
-
-        if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === 0) {
-
-            $pastaUploads = __DIR__ . '/uploads/posts/';
-
-            if (!is_dir($pastaUploads)) {
-                mkdir($pastaUploads, 0777, true);
-            }
-
-            $extensao = pathinfo(
-                $_FILES['imagem']['name'],
-                PATHINFO_EXTENSION
-            );
-
-            $nomeImagem = uniqid() . '.' . $extensao;
-
-            move_uploaded_file(
-                $_FILES['imagem']['tmp_name'],
-                $pastaUploads . $nomeImagem
-            );
-        }
-
         $stmt = $pdo->prepare("
-            INSERT INTO posts (
+            INSERT INTO reviews (
                 user_id,
-                title,
-                content,
-                image
+                book_id,
+                review_title,
+                review_text,
+                rating
             )
             VALUES (
                 :user_id,
-                :title,
-                :content,
-                :image
+                :book_id,
+                :review_title,
+                :review_text,
+                :rating
             )
         ");
 
         $stmt->execute([
             ':user_id' => $usuarioId,
-            ':title' => $titulo,
-            ':content' => $conteudo,
-            ':image' => $nomeImagem
+            ':book_id' => $livroId,
+            ':review_title' => $titulo,
+            ':review_text' => $texto,
+            ':rating' => !empty($nota)
+                ? $nota
+                : null
         ]);
 
-        $mensagem = 'Post publicado com sucesso!';
+        $mensagem = 'Review publicada com sucesso!';
     }
 }
 
 /*
 |--------------------------------------------------------------------------
-| LISTAR POSTS
+| LISTAR REVIEWS
 |--------------------------------------------------------------------------
 */
 
 $stmt = $pdo->prepare("
-    SELECT *
-    FROM posts
-    WHERE user_id = :user_id
-    ORDER BY id DESC
+    SELECT
+        reviews.*,
+        shelves.title AS book_title,
+        shelves.cover AS book_cover
+    FROM reviews
+
+    INNER JOIN shelves
+        ON reviews.book_id = shelves.id
+
+    WHERE reviews.user_id = :user_id
+
+    ORDER BY reviews.id DESC
 ");
 
 $stmt->execute([
     ':user_id' => $usuarioId
 ]);
 
-$posts = $stmt->fetchAll();
+$reviews = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -128,7 +144,7 @@ $posts = $stmt->fetchAll();
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>ShelfHub | Posts</title>
+    <title>ShelfHub | Reviews</title>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
@@ -359,6 +375,7 @@ $posts = $stmt->fetchAll();
         }
 
         input,
+        select,
         textarea {
 
             width: 100%;
@@ -429,7 +446,7 @@ $posts = $stmt->fetchAll();
             margin-bottom: 20px;
         }
 
-        .posts-grid {
+        .reviews-grid {
 
             display: grid;
 
@@ -439,7 +456,7 @@ $posts = $stmt->fetchAll();
             gap: 24px;
         }
 
-        .post-card {
+        .review-card {
 
             background:
                 rgba(255, 255, 255, 0.70);
@@ -451,39 +468,57 @@ $posts = $stmt->fetchAll();
             box-shadow: var(--shadow);
         }
 
-        .post-image {
+        .review-cover {
 
             width: 100%;
 
-            height: 240px;
+            height: 260px;
 
             object-fit: cover;
         }
 
-        .post-content {
+        .review-content {
 
             padding: 24px;
         }
 
-        .post-title {
+        .review-book {
+
+            color: var(--primary);
+
+            font-weight: 700;
+
+            margin-bottom: 10px;
+        }
+
+        .review-title {
 
             font-size: 24px;
 
             font-weight: 800;
 
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
-        .post-text {
+        .review-text {
 
             color: var(--text-muted);
 
             line-height: 1.7;
         }
 
-        .post-date {
+        .review-rating {
 
             margin-top: 18px;
+
+            font-weight: 700;
+
+            color: #ca8a04;
+        }
+
+        .review-date {
+
+            margin-top: 10px;
 
             font-size: 13px;
 
@@ -545,12 +580,12 @@ $posts = $stmt->fetchAll();
                 Estantes
             </a>
 
-            <a href="reviews.php" class="menu-item">
-                Reviews
+            <a href="posts.php" class="menu-item">
+                Posts
             </a>
 
             <a href="#" class="menu-item active">
-                Posts
+                Reviews
             </a>
 
         </nav>
@@ -561,14 +596,14 @@ $posts = $stmt->fetchAll();
 
         <div class="topbar">
 
-            <h1>Posts</h1>
+            <h1>Reviews</h1>
 
         </div>
 
         <div class="card">
 
             <h2 class="card-title">
-                Novo Post
+                Nova Review
             </h2>
 
             <?php if ($mensagem): ?>
@@ -587,14 +622,38 @@ $posts = $stmt->fetchAll();
 
             <?php endif; ?>
 
-            <form
-                method="POST"
-                enctype="multipart/form-data">
+            <form method="POST">
 
                 <div class="form-group">
 
                     <label>
-                        Título
+                        Livro
+                    </label>
+
+                    <select name="livro_id">
+
+                        <option value="">
+                            Selecione um livro
+                        </option>
+
+                        <?php foreach ($books as $book): ?>
+
+                            <option value="<?= $book['id'] ?>">
+
+                                <?= htmlspecialchars($book['title']) ?>
+
+                            </option>
+
+                        <?php endforeach; ?>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Título da review
                     </label>
 
                     <input
@@ -606,24 +665,26 @@ $posts = $stmt->fetchAll();
                 <div class="form-group">
 
                     <label>
-                        Imagem
+                        Nota
                     </label>
 
                     <input
-                        type="file"
-                        name="imagem"
-                        accept="image/*">
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        max="5"
+                        name="nota">
 
                 </div>
 
                 <div class="form-group">
 
                     <label>
-                        Conteúdo
+                        Review
                     </label>
 
                     <textarea
-                        name="conteudo"></textarea>
+                        name="texto"></textarea>
 
                 </div>
 
@@ -631,7 +692,7 @@ $posts = $stmt->fetchAll();
                     type="submit"
                     class="submit-btn">
 
-                    Publicar Post
+                    Publicar Review
 
                 </button>
 
@@ -639,37 +700,53 @@ $posts = $stmt->fetchAll();
 
         </div>
 
-        <div class="posts-grid">
+        <div class="reviews-grid">
 
-            <?php foreach ($posts as $post): ?>
+            <?php foreach ($reviews as $review): ?>
 
-                <div class="post-card">
+                <div class="review-card">
 
-                    <?php if ($post['image']): ?>
+                    <?php if ($review['book_cover']): ?>
 
                         <img
-                            src="uploads/posts/<?= htmlspecialchars($post['image']) ?>"
-                            class="post-image">
+                            src="uploads/books/<?= htmlspecialchars($review['book_cover']) ?>"
+                            class="review-cover">
 
                     <?php endif; ?>
 
-                    <div class="post-content">
+                    <div class="review-content">
 
-                        <div class="post-title">
+                        <div class="review-book">
 
-                            <?= htmlspecialchars($post['title']) ?>
-
-                        </div>
-
-                        <div class="post-text">
-
-                            <?= nl2br(htmlspecialchars($post['content'])) ?>
+                            <?= htmlspecialchars($review['book_title']) ?>
 
                         </div>
 
-                        <div class="post-date">
+                        <div class="review-title">
 
-                            <?= date('d/m/Y H:i', strtotime($post['created_at'])) ?>
+                            <?= htmlspecialchars($review['review_title']) ?>
+
+                        </div>
+
+                        <div class="review-text">
+
+                            <?= nl2br(htmlspecialchars($review['review_text'])) ?>
+
+                        </div>
+
+                        <?php if ($review['rating']): ?>
+
+                            <div class="review-rating">
+
+                                ⭐ <?= $review['rating'] ?>/5
+
+                            </div>
+
+                        <?php endif; ?>
+
+                        <div class="review-date">
+
+                            <?= date('d/m/Y H:i', strtotime($review['created_at'])) ?>
 
                         </div>
 

@@ -635,7 +635,7 @@ $books = $stmt->fetchAll();
                 <a href="../dashboard.php" class="menu-item">Início</a>
                 <a href="authors.php" class="menu-item">Autores</a>
                 <a href="#" class="menu-item active">Estantes</a>
-                <a href="#" class="menu-item">Reviews</a>
+                <a href="reviews.php" class="menu-item">Reviews</a>
                 <a href="posts.php" class="menu-item">Posts</a>
             </nav>
         </div>
