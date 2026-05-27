@@ -22,80 +22,81 @@ $pdo->exec("
     CREATE TABLE IF NOT EXISTS posts (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
-        title VARCHAR(255) NOT NULL,
+        book_id INT NOT NULL,
         content TEXT NOT NULL,
-        image VARCHAR(255) DEFAULT NULL,
+        reading_progress VARCHAR(255) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
 ");
 
 /*
 |--------------------------------------------------------------------------
-| CADASTRAR POST
+| PUBLICAR POST
 |--------------------------------------------------------------------------
 */
 
 $mensagem = '';
 $erro = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_post'])) {
 
-    $titulo = trim($_POST['titulo'] ?? '');
-    $conteudo = trim($_POST['conteudo'] ?? '');
+    $bookId = $_POST['book_id'] ?? '';
+    $conteudo = trim($_POST['content'] ?? '');
+    $readingProgress = trim($_POST['reading_progress'] ?? '');
 
-    if (empty($titulo) || empty($conteudo)) {
+    if (
+        empty($bookId) ||
+        empty($conteudo) ||
+        empty($readingProgress)
+    ) {
 
         $erro = 'Preencha todos os campos.';
     } else {
 
-        $nomeImagem = null;
-
-        if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === 0) {
-
-            $pastaUploads = __DIR__ . '/uploads/posts/';
-
-            if (!is_dir($pastaUploads)) {
-                mkdir($pastaUploads, 0777, true);
-            }
-
-            $extensao = pathinfo(
-                $_FILES['imagem']['name'],
-                PATHINFO_EXTENSION
-            );
-
-            $nomeImagem = uniqid() . '.' . $extensao;
-
-            move_uploaded_file(
-                $_FILES['imagem']['tmp_name'],
-                $pastaUploads . $nomeImagem
-            );
-        }
-
         $stmt = $pdo->prepare("
             INSERT INTO posts (
                 user_id,
-                title,
+                book_id,
                 content,
-                image
+                reading_progress
             )
             VALUES (
                 :user_id,
-                :title,
+                :book_id,
                 :content,
-                :image
+                :reading_progress
             )
         ");
 
         $stmt->execute([
             ':user_id' => $usuarioId,
-            ':title' => $titulo,
+            ':book_id' => $bookId,
             ':content' => $conteudo,
-            ':image' => $nomeImagem
+            ':reading_progress' => $readingProgress
         ]);
 
-        $mensagem = 'Post publicado com sucesso!';
+        $mensagem = 'Comentário publicado!';
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| LISTAR LIVROS
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+    SELECT *
+    FROM shelves
+    WHERE user_id = :user_id
+    ORDER BY title ASC
+");
+
+$stmt->execute([
+    ':user_id' => $usuarioId
+]);
+
+$books = $stmt->fetchAll();
 
 /*
 |--------------------------------------------------------------------------
@@ -104,10 +105,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 */
 
 $stmt = $pdo->prepare("
-    SELECT *
+    SELECT
+        posts.*,
+        shelves.title,
+        shelves.cover
     FROM posts
-    WHERE user_id = :user_id
-    ORDER BY id DESC
+    INNER JOIN shelves
+        ON posts.book_id = shelves.id
+    WHERE posts.user_id = :user_id
+    ORDER BY posts.id DESC
 ");
 
 $stmt->execute([
@@ -227,6 +233,16 @@ $posts = $stmt->fetchAll();
 
             left: 0;
             top: 0;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar-top {
+
+            display: flex;
+            flex-direction: column;
         }
 
         .logo {
@@ -314,6 +330,15 @@ $posts = $stmt->fetchAll();
             font-size: 42px;
 
             color: var(--primary);
+
+            font-weight: 800;
+        }
+
+        .topbar p {
+
+            color: var(--text-muted);
+
+            margin-top: 8px;
         }
 
         .card {
@@ -335,13 +360,11 @@ $posts = $stmt->fetchAll();
             margin-bottom: 30px;
         }
 
-        .card-title {
+        .card h2 {
 
-            font-size: 24px;
+            color: var(--primary);
 
-            font-weight: 700;
-
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-group {
@@ -359,7 +382,8 @@ $posts = $stmt->fetchAll();
         }
 
         input,
-        textarea {
+        textarea,
+        select {
 
             width: 100%;
 
@@ -376,9 +400,9 @@ $posts = $stmt->fetchAll();
 
         textarea {
 
-            min-height: 180px;
-
             resize: vertical;
+
+            min-height: 140px;
         }
 
         .submit-btn {
@@ -429,12 +453,11 @@ $posts = $stmt->fetchAll();
             margin-bottom: 20px;
         }
 
-        .posts-grid {
+        .posts {
 
-            display: grid;
+            display: flex;
 
-            grid-template-columns:
-                repeat(auto-fit, minmax(320px, 1fr));
+            flex-direction: column;
 
             gap: 24px;
         }
@@ -442,55 +465,85 @@ $posts = $stmt->fetchAll();
         .post-card {
 
             background:
-                rgba(255, 255, 255, 0.70);
+                rgba(255, 255, 255, 0.55);
 
-            border-radius: 22px;
+            border:
+                1px solid rgba(255, 255, 255, 0.35);
 
-            overflow: hidden;
+            backdrop-filter: blur(18px);
+
+            border-radius: var(--radius);
+
+            padding: 24px;
 
             box-shadow: var(--shadow);
         }
 
-        .post-image {
+        .book-info {
 
-            width: 100%;
+            display: flex;
 
-            height: 240px;
+            align-items: center;
+
+            gap: 18px;
+
+            margin-bottom: 20px;
+        }
+
+        .book-cover {
+
+            width: 80px;
+
+            height: 110px;
 
             object-fit: cover;
+
+            border-radius: 14px;
+        }
+
+        .book-title {
+
+            font-size: 22px;
+
+            font-weight: 700;
+        }
+
+        .progress {
+
+            display: inline-block;
+
+            margin-top: 8px;
+
+            background: var(--primary-soft);
+
+            color: var(--primary);
+
+            padding: 8px 14px;
+
+            border-radius: 999px;
+
+            font-size: 13px;
+
+            font-weight: 700;
         }
 
         .post-content {
 
-            padding: 24px;
-        }
+            line-height: 1.8;
 
-        .post-title {
-
-            font-size: 24px;
-
-            font-weight: 800;
-
-            margin-bottom: 12px;
-        }
-
-        .post-text {
-
-            color: var(--text-muted);
-
-            line-height: 1.7;
+            color: #52525b;
         }
 
         .post-date {
 
             margin-top: 18px;
 
-            font-size: 13px;
+            color: var(--text-muted);
 
-            color: #a1a1aa;
+            font-size: 14px;
         }
 
-        @media (max-width: 900px) {
+        @media(max-width:900px) {
 
             body {
 
@@ -511,8 +564,13 @@ $posts = $stmt->fetchAll();
                 margin-left: 0;
 
                 width: 100%;
+            }
 
-                padding: 20px;
+            .book-info {
+
+                flex-direction: column;
+
+                align-items: flex-start;
             }
         }
     </style>
@@ -523,37 +581,45 @@ $posts = $stmt->fetchAll();
 
     <aside class="sidebar">
 
-        <h1 class="logo">
-            ShelfHub
-        </h1>
+        <div class="sidebar-top">
 
-        <p class="logo-subtitle">
-            Sistema de Biblioteca
-        </p>
+            <div>
 
-        <nav class="sidebar-menu">
+                <h1 class="logo">
+                    ShelfHub
+                </h1>
 
-            <a href="../dashboard.php" class="menu-item">
-                Início
-            </a>
+                <p class="logo-subtitle">
+                    Sistema de Biblioteca
+                </p>
 
-            <a href="authors.php" class="menu-item">
-                Autores
-            </a>
+            </div>
 
-            <a href="shelves.php" class="menu-item">
-                Estantes
-            </a>
+            <nav class="sidebar-menu">
 
-            <a href="reviews.php" class="menu-item">
-                Reviews
-            </a>
+                <a href="../dashboard.php" class="menu-item">
+                    Início
+                </a>
 
-            <a href="#" class="menu-item active">
-                Posts
-            </a>
+                <a href="authors.php" class="menu-item">
+                    Autores
+                </a>
 
-        </nav>
+                <a href="shelves.php" class="menu-item">
+                    Estantes
+                </a>
+
+                <a href="#" class="menu-item active">
+                    Posts
+                </a>
+
+                <a href="reviews.php" class="menu-item">
+                    Reviews
+                </a>
+
+            </nav>
+
+        </div>
 
     </aside>
 
@@ -561,15 +627,17 @@ $posts = $stmt->fetchAll();
 
         <div class="topbar">
 
-            <h1>Posts</h1>
+            <h1>Posts de Leitura</h1>
+
+            <p>
+                Compartilhe comentários durante sua leitura.
+            </p>
 
         </div>
 
         <div class="card">
 
-            <h2 class="card-title">
-                Novo Post
-            </h2>
+            <h2>Novo comentário</h2>
 
             <?php if ($mensagem): ?>
 
@@ -587,51 +655,69 @@ $posts = $stmt->fetchAll();
 
             <?php endif; ?>
 
-            <form
-                method="POST"
-                enctype="multipart/form-data">
+            <form method="POST">
 
                 <div class="form-group">
 
                     <label>
-                        Título
+                        Livro
+                    </label>
+
+                    <select
+                        name="book_id"
+                        required>
+
+                        <option value="">
+                            Selecione um livro
+                        </option>
+
+                        <?php foreach ($books as $book): ?>
+
+                            <option value="<?= $book['id'] ?>">
+
+                                <?= htmlspecialchars($book['title']) ?>
+
+                            </option>
+
+                        <?php endforeach; ?>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Em que parte da leitura você está?
                     </label>
 
                     <input
                         type="text"
-                        name="titulo">
+                        name="reading_progress"
+                        placeholder="Ex: Página 120, Capítulo 5..."
+                        required>
 
                 </div>
 
                 <div class="form-group">
 
                     <label>
-                        Imagem
-                    </label>
-
-                    <input
-                        type="file"
-                        name="imagem"
-                        accept="image/*">
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>
-                        Conteúdo
+                        Comentário da leitura
                     </label>
 
                     <textarea
-                        name="conteudo"></textarea>
+                        name="content"
+                        placeholder="Escreva seu comentário..."
+                        required></textarea>
 
                 </div>
 
                 <button
                     type="submit"
+                    name="create_post"
                     class="submit-btn">
 
-                    Publicar Post
+                    Publicar comentário
 
                 </button>
 
@@ -639,39 +725,52 @@ $posts = $stmt->fetchAll();
 
         </div>
 
-        <div class="posts-grid">
+        <div class="posts">
 
             <?php foreach ($posts as $post): ?>
 
                 <div class="post-card">
 
-                    <?php if ($post['image']): ?>
+                    <div class="book-info">
 
-                        <img
-                            src="uploads/posts/<?= htmlspecialchars($post['image']) ?>"
-                            class="post-image">
+                        <?php if ($post['cover']): ?>
 
-                    <?php endif; ?>
+                            <img
+                                src="uploads/books/<?= htmlspecialchars($post['cover']) ?>"
+                                class="book-cover">
+
+                        <?php endif; ?>
+
+                        <div>
+
+                            <div class="book-title">
+
+                                <?= htmlspecialchars($post['title']) ?>
+
+                            </div>
+
+                            <div class="progress">
+
+                                <?= htmlspecialchars($post['reading_progress']) ?>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                     <div class="post-content">
 
-                        <div class="post-title">
+                        <?= nl2br(htmlspecialchars($post['content'])) ?>
 
-                            <?= htmlspecialchars($post['title']) ?>
+                    </div>
 
-                        </div>
+                    <div class="post-date">
 
-                        <div class="post-text">
-
-                            <?= nl2br(htmlspecialchars($post['content'])) ?>
-
-                        </div>
-
-                        <div class="post-date">
-
-                            <?= date('d/m/Y H:i', strtotime($post['created_at'])) ?>
-
-                        </div>
+                        <?= date(
+                            'd/m/Y H:i',
+                            strtotime($post['created_at'])
+                        ) ?>
 
                     </div>
 

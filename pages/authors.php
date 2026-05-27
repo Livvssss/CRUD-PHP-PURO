@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nome) || empty($bio)) {
 
         $erro = 'Preencha todos os campos.';
+
     } else {
 
         $nomeFoto = null;
@@ -57,17 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mkdir($pastaUploads, 0777, true);
             }
 
-            $extensao = pathinfo(
-                $_FILES['foto']['name'],
-                PATHINFO_EXTENSION
-            );
+            $extensao = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
 
             $nomeFoto = uniqid() . '.' . $extensao;
 
-            move_uploaded_file(
-                $_FILES['foto']['tmp_name'],
-                $pastaUploads . $nomeFoto
-            );
+            move_uploaded_file($_FILES['foto']['tmp_name'], $pastaUploads . $nomeFoto);
         }
 
         $stmt = $pdo->prepare("
@@ -118,167 +113,74 @@ $authors = $stmt->fetchAll();
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShelfHub | Autores</title>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="css/authors.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/authors.css">
 </head>
 
 <body>
 
     <!-- SIDEBAR -->
     <nav class="sidebar">
-
         <div class="sidebar-header">
-
             <h2>ShelfHub</h2>
-
             <p>Sistema de Biblioteca</p>
-
         </div>
 
         <div class="sidebar-menu">
-
-            <a
-                href="../dashboard.php"
-                class="menu-item">
-                Início
-            </a>
-
-            <a
-                href="#"
-                class="menu-item active">
-                Autores
-            </a>
-
-            <a
-                href="shelves.php"
-                class="menu-item">
-                Estantes
-            </a>
-
-            <a
-                href="reviews.php"
-                class="menu-item">
-                Reviews
-            </a>
-
-            <a
-                href="posts.php"
-                class="menu-item">
-                Posts
-            </a>
-
+            <a href="../dashboard.php" class="menu-item">Início</a>
+            <a href="authors.php" class="menu-item active">Autores</a>
+            <a href="shelves.php" class="menu-item">Estantes</a>
+            <a href="reviews.php" class="menu-item">Reviews</a>
+            <a href="posts.php" class="menu-item">Posts</a>
         </div>
-
     </nav>
 
     <!-- LOGO FUNDO -->
     <div class="background-logo">
-
-        <img
-            src="../img/logo.png"
-            alt="Logo ShelfHub">
-
+        <img src="../img/logo.png" alt="Logo ShelfHub">
     </div>
 
     <!-- CONTEÚDO -->
     <main class="page-wrapper">
 
         <div class="hero">
-
             <h1>Autores</h1>
-
-            <p class="subtitle">
-                Cadastre autores da sua biblioteca pessoal.
-            </p>
-
+            <p class="subtitle">Cadastre autores da sua biblioteca pessoal.</p>
         </div>
 
         <div class="container">
-
             <!-- FORM -->
             <div class="card">
-
-                <h2 class="card-title">
-                    Novo Autor
-                </h2>
-
+                <h2 class="card-title">Novo Autor</h2>
                 <?php if ($mensagem): ?>
-
-                    <div class="message">
-                        <?= htmlspecialchars($mensagem) ?>
-                    </div>
-
+                    <div class="message"><?= htmlspecialchars($mensagem) ?></div>
                 <?php endif; ?>
 
                 <?php if ($erro): ?>
-
-                    <div class="error">
-                        <?= htmlspecialchars($erro) ?>
-                    </div>
-
+                    <div class="error"><?= htmlspecialchars($erro) ?></div>
                 <?php endif; ?>
 
-                <form
-                    method="POST"
-                    enctype="multipart/form-data">
-
+                <form method="POST" enctype="multipart/form-data">
                     <div class="form-group">
-
-                        <label>
-                            Nome do autor
-                        </label>
-
-                        <input
-                            type="text"
-                            name="nome"
-                            placeholder="Digite o nome">
-
+                        <label>Nome do autor</label>
+                        <input type="text" name="nome" placeholder="Digite o nome">
                     </div>
 
                     <div class="form-group">
-
-                        <label>
-                            Foto
-                        </label>
-
-                        <input
-                            type="file"
-                            name="foto"
-                            accept="image/*">
-
+                        <label>Foto</label>
+                        <input type="file" name="foto" accept="image/*">
                     </div>
 
                     <div class="form-group">
-
-                        <label>
-                            Biografia
-                        </label>
-
-                        <textarea
-                            name="bio"
-                            placeholder="Digite a biografia"></textarea>
-
+                        <label>Biografia</label>
+                        <textarea name="bio" placeholder="Digite a biografia"></textarea>
                     </div>
 
-                    <button
-                        type="submit"
-                        class="submit-btn">
-                        Cadastrar Autor
-                    </button>
+                    <button type="submit" class="submit-btn">Cadastrar Autor</button>
 
                 </form>
 
@@ -288,47 +190,27 @@ $authors = $stmt->fetchAll();
             <div class="authors-grid">
 
                 <?php if (count($authors) > 0): ?>
-
                     <?php foreach ($authors as $author): ?>
 
                         <div class="author-card">
-
-                            <div
-                                class="author-name"
-                                onclick="togglePhoto('foto<?= $author['id'] ?>')">
-
+                            <div class="author-name" onclick="togglePhoto('foto<?= $author['id'] ?>')">
                                 <?= htmlspecialchars($author['name']) ?>
-
                             </div>
 
                             <?php if ($author['photo']): ?>
-
-                                <img
-                                    id="foto<?= $author['id'] ?>"
-                                    src="uploads/authors/<?= htmlspecialchars($author['photo']) ?>"
-                                    class="author-photo"
-                                    alt="Foto do autor">
-
+                                <img id="foto<?= $author['id'] ?>" src="uploads/authors/<?= htmlspecialchars($author['photo']) ?>" class="author-photo" alt="Foto do autor">
                             <?php endif; ?>
 
                             <div class="author-bio">
-
                                 <?= nl2br(htmlspecialchars($author['bio'])) ?>
-
                             </div>
-
                         </div>
 
                     <?php endforeach; ?>
 
                 <?php else: ?>
-
-                    <p class="empty">
-                        Nenhum autor cadastrado ainda.
-                    </p>
-
+                    <p class="empty">Nenhum autor cadastrado ainda.</p>
                 <?php endif; ?>
-
             </div>
 
         </div>
@@ -338,22 +220,16 @@ $authors = $stmt->fetchAll();
     <script>
         function togglePhoto(id) {
 
-            const foto =
-                document.getElementById(id);
-
+            const foto = document.getElementById(id);
             if (!foto) return;
-
             if (foto.style.display === 'block') {
-
                 foto.style.display = 'none';
 
             } else {
-
                 foto.style.display = 'block';
             }
         }
     </script>
 
 </body>
-
 </html>
