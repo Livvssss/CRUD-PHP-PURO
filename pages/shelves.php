@@ -14,80 +14,6 @@ $usuarioNome = $_SESSION['usuario_nome'] ?? 'Usuário';
 
 /*
 |--------------------------------------------------------------------------
-| CRIAR TABELAS E CORRIGIR COLUNAS EM FALTA
-|--------------------------------------------------------------------------
-*/
-
-$pdo->exec("
-    CREATE TABLE IF NOT EXISTS authors (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        name VARCHAR(255) NOT NULL,
-        bio TEXT NOT NULL,
-        photo VARCHAR(255) DEFAULT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-");
-
-$pdo->exec("
-    CREATE TABLE IF NOT EXISTS shelves (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        author_id INT NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        cover VARCHAR(255) DEFAULT NULL,
-        release_date DATE,
-        reading_status VARCHAR(50) DEFAULT 'Lendo',
-        rating DECIMAL(2,1) DEFAULT NULL,
-        reading_date DATE DEFAULT NULL,
-        reading_start DATE DEFAULT NULL,
-        reading_end DATE DEFAULT NULL,
-        reading_goal VARCHAR(255) DEFAULT NULL,
-        reading_time VARCHAR(255) DEFAULT NULL,
-        tags VARCHAR(255) DEFAULT NULL,
-        review TEXT DEFAULT NULL,
-        quotes TEXT DEFAULT NULL,
-        reading_history TEXT DEFAULT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-");
-
-// Garante que as colunas novas existam caso a tabela já tenha sido criada anteriormente
-try {
-    $pdo->exec("ALTER TABLE shelves ADD COLUMN reading_start DATE DEFAULT NULL");
-} catch (Exception $e) {
-}
-try {
-    $pdo->exec("ALTER TABLE shelves ADD COLUMN reading_end DATE DEFAULT NULL");
-} catch (Exception $e) {
-}
-try {
-    $pdo->exec("ALTER TABLE shelves ADD COLUMN reading_goal VARCHAR(255) DEFAULT NULL");
-} catch (Exception $e) {
-}
-try {
-    $pdo->exec("ALTER TABLE shelves ADD COLUMN reading_time VARCHAR(255) DEFAULT NULL");
-} catch (Exception $e) {
-}
-try {
-    $pdo->exec("ALTER TABLE shelves ADD COLUMN tags VARCHAR(255) DEFAULT NULL");
-} catch (Exception $e) {
-}
-try {
-    $pdo->exec("ALTER TABLE shelves ADD COLUMN review TEXT DEFAULT NULL");
-} catch (Exception $e) {
-}
-try {
-    $pdo->exec("ALTER TABLE shelves ADD COLUMN quotes TEXT DEFAULT NULL");
-} catch (Exception $e) {
-}
-try {
-    $pdo->exec("ALTER TABLE shelves ADD COLUMN reading_history TEXT DEFAULT NULL");
-} catch (Exception $e) {
-}
-
-/*
-|--------------------------------------------------------------------------
 | CADASTRAR LIVRO
 |--------------------------------------------------------------------------
 */
@@ -96,21 +22,30 @@ $mensagem = '';
 $erro = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cadastrar_livro'])) {
+
     $titulo = trim($_POST['titulo'] ?? '');
     $autor = $_POST['autor'] ?? '';
     $dataLancamento = $_POST['data_lancamento'] ?? '';
 
     if (empty($titulo) || empty($autor)) {
+
         $erro = 'Preencha os campos obrigatórios.';
+
     } else {
+
         $nomeCapa = null;
+
         if (isset($_FILES['capa']) && $_FILES['capa']['error'] === 0) {
+
             $pastaUploads = __DIR__ . '/uploads/books/';
+
             if (!is_dir($pastaUploads)) {
                 mkdir($pastaUploads, 0777, true);
             }
+
             $extensao = pathinfo($_FILES['capa']['name'], PATHINFO_EXTENSION);
             $nomeCapa = uniqid() . '.' . $extensao;
+
             move_uploaded_file($_FILES['capa']['tmp_name'], $pastaUploads . $nomeCapa);
         }
 
@@ -118,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cadastrar_livro'])) {
             INSERT INTO shelves (user_id, author_id, title, cover, release_date)
             VALUES (:user_id, :author_id, :title, :cover, :release_date)
         ");
+
         $stmt->execute([
             ':user_id' => $usuarioId,
             ':author_id' => $autor,
@@ -125,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cadastrar_livro'])) {
             ':cover' => $nomeCapa,
             ':release_date' => $dataLancamento
         ]);
+
         $mensagem = 'Livro adicionado à estante!';
     }
 }
@@ -136,7 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cadastrar_livro'])) {
 */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_opcoes'])) {
+
     $livroId = $_POST['livro_id'];
+
     $stmt = $pdo->prepare("
         UPDATE shelves
         SET
@@ -154,36 +93,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_opcoes'])) {
         WHERE id = :id
         AND user_id = :user_id
     ");
+
     $stmt->execute([
         ':reading_status' => $_POST['reading_status'],
-
-        ':rating' => !empty($_POST['rating'])
-            ? $_POST['rating']
-            : null,
-
+        ':rating' => !empty($_POST['rating']) ? $_POST['rating'] : null,
         ':reading_goal' => $_POST['reading_goal'],
         ':reading_time' => $_POST['reading_time'],
         ':tags' => $_POST['tags'],
         ':review' => $_POST['review'],
         ':quotes' => $_POST['quotes'],
         ':reading_history' => $_POST['reading_history'],
-
-        ':reading_date' => !empty($_POST['reading_date'])
-            ? $_POST['reading_date']
-            : null,
-
-        ':reading_start' => !empty($_POST['reading_start'])
-            ? $_POST['reading_start']
-            : null,
-
-        ':reading_end' => !empty($_POST['reading_end'])
-            ? $_POST['reading_end']
-            : null,
-
+        ':reading_date' => !empty($_POST['reading_date']) ? $_POST['reading_date'] : null,
+        ':reading_start' => !empty($_POST['reading_start']) ? $_POST['reading_start'] : null,
+        ':reading_end' => !empty($_POST['reading_end']) ? $_POST['reading_end'] : null,
         ':id' => $livroId,
         ':user_id' => $usuarioId
     ]);
+
     $mensagem = 'Livro atualizado!';
+}
+
+/*
+|--------------------------------------------------------------------------
+| DELETAR LIVRO
+|--------------------------------------------------------------------------
+*/
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deletar_livro'])) {
+
+    $livroId = $_POST['livro_id'] ?? '';
+
+    $stmt = $pdo->prepare("
+        SELECT cover
+        FROM shelves
+        WHERE id = :id
+        AND user_id = :user_id
+        LIMIT 1
+    ");
+
+    $stmt->execute([
+        ':id' => $livroId,
+        ':user_id' => $usuarioId
+    ]);
+
+    $livro = $stmt->fetch();
+
+    if ($livro) {
+
+        if (!empty($livro['cover'])) {
+
+            $caminhoCapa = __DIR__ . '/uploads/books/' . $livro['cover'];
+
+            if (file_exists($caminhoCapa)) {
+                unlink($caminhoCapa);
+            }
+        }
+
+        $stmt = $pdo->prepare("
+            DELETE FROM shelves
+            WHERE id = :id
+            AND user_id = :user_id
+        ");
+
+        $stmt->execute([
+            ':id' => $livroId,
+            ':user_id' => $usuarioId
+        ]);
+
+        $mensagem = 'Livro removido da estante!';
+    }
 }
 
 /*
@@ -198,9 +176,11 @@ $stmt = $pdo->prepare("
     WHERE user_id = :user_id
     ORDER BY name ASC
 ");
+
 $stmt->execute([
     ':user_id' => $usuarioId
 ]);
+
 $authors = $stmt->fetchAll();
 
 /*
@@ -210,18 +190,17 @@ $authors = $stmt->fetchAll();
 */
 
 $stmt = $pdo->prepare("
-    SELECT
-        shelves.*,
-        authors.name AS author_name
+    SELECT shelves.*, authors.name AS author_name
     FROM shelves
-    INNER JOIN authors
-        ON shelves.author_id = authors.id
+    INNER JOIN authors ON shelves.author_id = authors.id
     WHERE shelves.user_id = :user_id
     ORDER BY shelves.id DESC
 ");
+
 $stmt->execute([
     ':user_id' => $usuarioId
 ]);
+
 $books = $stmt->fetchAll();
 ?>
 
@@ -229,15 +208,18 @@ $books = $stmt->fetchAll();
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>ShelfHub | Estante</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/shelves.css">
+
 </head>
 
 <body>
-
     <aside class="sidebar">
         <div class="sidebar-top">
             <div>
@@ -261,11 +243,14 @@ $books = $stmt->fetchAll();
 
     <main class="main-content">
         <div class="topbar">
+
             <div class="welcome">
                 <h1>Minha Estante</h1>
                 <p>Olá, <?= htmlspecialchars($usuarioNome) ?>. Organize e gerencie suas leituras.</p>
             </div>
+
             <div class="profile-badge">ShelfHub</div>
+
         </div>
 
         <div class="card">
@@ -321,7 +306,6 @@ $books = $stmt->fetchAll();
                     <div class="book-title"><?= htmlspecialchars($book['title']) ?></div>
                     <div class="book-author"><?= htmlspecialchars($book['author_name']) ?></div>
                     <div class="book-status"><?= htmlspecialchars($book['reading_status']) ?></div>
-
                     <button class="options-btn" onclick="abrirModal('modal<?= $book['id'] ?>')">Opções do livro</button>
                 </div>
 
@@ -330,7 +314,6 @@ $books = $stmt->fetchAll();
                         <h2 style="margin-bottom:25px;"><?= htmlspecialchars($book['title']) ?></h2>
                         <form method="POST">
                             <input type="hidden" name="livro_id" value="<?= $book['id'] ?>">
-
                             <div class="modal-grid">
                                 <div class="form-group">
                                     <label>Status</label>
@@ -393,6 +376,7 @@ $books = $stmt->fetchAll();
                             </div>
 
                             <button type="submit" name="salvar_opcoes" class="submit-btn">Salvar Alterações</button>
+                            <button type="submit" name="deletar_livro" class="submit-btn" style="background:#dc2626; margin-top:10px;" onclick="return confirm('Deseja realmente excluir este livro?')">Excluir Livro</button>
                             <button type="button" class="submit-btn" style="background:#ef4444; margin-top:10px;" onclick="fecharModal('modal<?= $book['id'] ?>')">Fechar</button>
                         </form>
                     </div>
@@ -410,6 +394,5 @@ $books = $stmt->fetchAll();
             document.getElementById(id).style.display = 'none';
         }
     </script>
-
 </body>
 </html>

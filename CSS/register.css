@@ -17,15 +17,15 @@
 }
 
 body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     background:
-        linear-gradient(rgba(255,252,242,0.82), rgba(254,249,231,0.86)),
-        url('img/logo.png');
+        linear-gradient(rgba(255, 252, 242, 0.82), rgba(254, 249, 231, 0.86)),
+        url("img/logo.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -38,16 +38,34 @@ body {
     padding: 24px;
 }
 
+.logout-btn {
+    width: 100%;
+    border: none;
+    background: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
+    padding: 16px 18px;
+    border-radius: 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.14);
+    transform: translateY(-2px);
+}
+
 .card {
     background: var(--surface);
-    border: 1px solid rgba(255,255,255,0.25);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(20px);
     border-radius: var(--radius);
     padding: 42px;
     box-shadow:
-        0 30px 60px rgba(0,0,0,0.06),
-        0 10px 30px rgba(217,119,6,0.08);
-    animation: fadeIn .7s ease;
+        0 30px 60px rgba(0, 0, 0, 0.06),
+        0 10px 30px rgba(217, 119, 6, 0.08);
+    animation: fadeIn 0.7s ease;
 }
 
 .logo-area {
@@ -80,13 +98,13 @@ body {
 .error {
     background: rgba(254, 226, 226, 0.65);
     color: #991b1b;
-    border: 1px solid rgba(248,113,113,0.20);
+    border: 1px solid rgba(248, 113, 113, 0.2);
 }
 
 .success {
     background: rgba(220, 252, 231, 0.65);
     color: #166534;
-    border: 1px solid rgba(34,197,94,0.20);
+    border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
 .form-group {
@@ -105,8 +123,8 @@ body {
     width: 100%;
     padding: 16px 18px;
     border-radius: 18px;
-    border: 1px solid rgba(255,255,255,0.22);
-    background: rgba(255,255,255,0.38);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.38);
     font-size: 15px;
     color: var(--text);
     outline: none;
@@ -114,9 +132,9 @@ body {
 }
 
 .input:focus {
-    background: rgba(255,255,255,0.52);
-    border-color: rgba(217,119,6,0.40);
-    box-shadow: 0 0 0 4px rgba(217,119,6,0.10);
+    background: rgba(255, 255, 255, 0.52);
+    border-color: rgba(217, 119, 6, 0.4);
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
 }
 
 .btn {
@@ -134,7 +152,7 @@ body {
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 14px 24px rgba(217,119,6,0.20);
+    box-shadow: 0 14px 24px rgba(217, 119, 6, 0.2);
 }
 
 .footer {

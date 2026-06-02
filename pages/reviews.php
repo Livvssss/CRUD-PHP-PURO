@@ -12,51 +12,14 @@ $pdo = getConexao();
 
 $usuarioId = $_SESSION['usuario_id'];
 
-/*
-|--------------------------------------------------------------------------
-| CRIAR TABELA REVIEWS
-|--------------------------------------------------------------------------
-*/
-
-$pdo->exec("
-    CREATE TABLE IF NOT EXISTS reviews (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        book_id INT NOT NULL,
-        review_title VARCHAR(255) NOT NULL,
-        review_text TEXT NOT NULL,
-        rating DECIMAL(2,1) DEFAULT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-");
-
-/*
-|--------------------------------------------------------------------------
-| LISTAR LIVROS
-|--------------------------------------------------------------------------
-*/
-
-$stmt = $pdo->prepare("
-    SELECT *
-    FROM shelves
-    WHERE user_id = :user_id
-    ORDER BY title ASC
-");
-
-$stmt->execute([
-    ':user_id' => $usuarioId
-]);
-
-$books = $stmt->fetchAll();
-
-/*
-|--------------------------------------------------------------------------
-| CADASTRAR REVIEW
-|--------------------------------------------------------------------------
-*/
-
 $mensagem = '';
 $erro = '';
+
+/*
+|--------------------------------------------------------------------------
+| CREATE - CADASTRAR REVIEW
+|--------------------------------------------------------------------------
+*/
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -78,8 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 review_title,
                 review_text,
                 rating
-            )
-            VALUES (
+            ) VALUES (
                 :user_id,
                 :book_id,
                 :review_title,
@@ -102,7 +64,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 /*
 |--------------------------------------------------------------------------
-| LISTAR REVIEWS
+| DELETE - DELETAR REVIEW
+|--------------------------------------------------------------------------
+*/
+
+if (isset($_GET['deletar'])) {
+
+    $reviewId = (int) $_GET['deletar'];
+
+    $stmt = $pdo->prepare("
+        DELETE FROM reviews
+        WHERE id = :id
+        AND user_id = :user_id
+    ");
+
+    $stmt->execute([
+        ':id' => $reviewId,
+        ':user_id' => $usuarioId
+    ]);
+
+    header('Location: reviews.php');
+    exit();
+}
+
+/*
+|--------------------------------------------------------------------------
+| READ - LISTAR LIVROS
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $pdo->prepare("
+    SELECT *
+    FROM shelves
+    WHERE user_id = :user_id
+    ORDER BY title ASC
+");
+
+$stmt->execute([
+    ':user_id' => $usuarioId
+]);
+
+$books = $stmt->fetchAll();
+
+/*
+|--------------------------------------------------------------------------
+| READ - LISTAR REVIEWS
 |--------------------------------------------------------------------------
 */
 
@@ -112,12 +118,9 @@ $stmt = $pdo->prepare("
         shelves.title AS book_title,
         shelves.cover AS book_cover
     FROM reviews
-
     INNER JOIN shelves
         ON reviews.book_id = shelves.id
-
     WHERE reviews.user_id = :user_id
-
     ORDER BY reviews.id DESC
 ");
 
@@ -152,6 +155,10 @@ $reviews = $stmt->fetchAll();
             <a href="posts.php" class="menu-item">Posts</a>
         </nav>
 
+        <form action="logout.php" method="POST">
+            <button type="submit" class="logout-btn">Sair do Sistema</button>
+        </form>
+
     </aside>
 
     <main class="main-content">
@@ -163,16 +170,21 @@ $reviews = $stmt->fetchAll();
             <h2 class="card-title">Nova Review</h2>
 
             <?php if ($mensagem): ?>
-                <div class="message"><?= htmlspecialchars($mensagem) ?></div>
+                <div class="message">
+                    <?= htmlspecialchars($mensagem) ?>
+                </div>
             <?php endif; ?>
 
             <?php if ($erro): ?>
-                <div class="error"><?= htmlspecialchars($erro) ?></div>
+                <div class="error">
+                    <?= htmlspecialchars($erro) ?>
+                </div>
             <?php endif; ?>
 
             <form method="POST">
                 <div class="form-group">
                     <label>Livro</label>
+
                     <select name="livro_id">
                         <option value="">Selecione um livro</option>
 
@@ -181,7 +193,6 @@ $reviews = $stmt->fetchAll();
                                 <?= htmlspecialchars($book['title']) ?>
                             </option>
                         <?php endforeach; ?>
-
                     </select>
                 </div>
 
@@ -203,21 +214,17 @@ $reviews = $stmt->fetchAll();
                 <button type="submit" class="submit-btn">
                     Publicar Review
                 </button>
-
             </form>
         </div>
 
         <div class="reviews-grid">
-
             <?php foreach ($reviews as $review): ?>
                 <div class="review-card">
-
                     <?php if ($review['book_cover']): ?>
-                        <img src="uploads/books/<?= htmlspecialchars($review['book_cover']) ?>" class="review-cover">
+                        <img src="uploads/books/<?= htmlspecialchars($review['book_cover']) ?>" class="review-cover">                    
                     <?php endif; ?>
 
                     <div class="review-content">
-
                         <div class="review-book">
                             <?= htmlspecialchars($review['book_title']) ?>
                         </div>
@@ -234,17 +241,17 @@ $reviews = $stmt->fetchAll();
                             <div class="review-rating">
                                 ⭐ <?= $review['rating'] ?>/5
                             </div>
-
                         <?php endif; ?>
+
                         <div class="review-date">
                             <?= date('d/m/Y H:i', strtotime($review['created_at'])) ?>
                         </div>
+
+                        <a href="?deletar=<?= $review['id'] ?>" class="delete-btn" onclick="return confirm('Deseja realmente excluir esta review?')"> Excluir </a>                       
                     </div>
                 </div>
             <?php endforeach; ?>
-
         </div>
     </main>
-
 </body>
 </html>

@@ -11,31 +11,14 @@ require_once __DIR__ . '/../config/database.php';
 $pdo = getConexao();
 $usuarioId = $_SESSION['usuario_id'];
 
-/*
-|--------------------------------------------------------------------------
-| CRIAR TABELA
-|--------------------------------------------------------------------------
-*/
-
-$pdo->exec("
-    CREATE TABLE IF NOT EXISTS authors (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        name VARCHAR(255) NOT NULL,
-        bio TEXT NOT NULL,
-        photo VARCHAR(255) DEFAULT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-");
-
-/*
-|--------------------------------------------------------------------------
-| CADASTRAR AUTOR
-|--------------------------------------------------------------------------
-*/
-
 $mensagem = '';
 $erro = '';
+
+/*
+|--------------------------------------------------------------------------
+| CREATE - CADASTRAR AUTOR
+|--------------------------------------------------------------------------
+*/
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -59,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $extensao = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-
             $nomeFoto = uniqid() . '.' . $extensao;
 
             move_uploaded_file($_FILES['foto']['tmp_name'], $pastaUploads . $nomeFoto);
@@ -71,8 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 name,
                 bio,
                 photo
-            )
-            VALUES (
+            ) VALUES (
                 :user_id,
                 :name,
                 :bio,
@@ -93,7 +74,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 /*
 |--------------------------------------------------------------------------
-| LISTAR AUTORES
+| DELETE - DELETAR AUTOR
+|--------------------------------------------------------------------------
+*/
+
+if (isset($_GET['deletar'])) {
+
+    $autorId = (int) $_GET['deletar'];
+
+    $stmt = $pdo->prepare("
+        SELECT photo
+        FROM authors
+        WHERE id = :id
+        AND user_id = :user_id
+    ");
+
+    $stmt->execute([
+        ':id' => $autorId,
+        ':user_id' => $usuarioId
+    ]);
+
+    $autor = $stmt->fetch();
+
+    if ($autor) {
+
+        if (!empty($autor['photo'])) {
+
+            $caminhoFoto = __DIR__ . '/uploads/authors/' . $autor['photo'];
+
+            if (file_exists($caminhoFoto)) {
+                unlink($caminhoFoto);
+            }
+        }
+
+        $stmt = $pdo->prepare("
+            DELETE FROM authors
+            WHERE id = :id
+            AND user_id = :user_id
+        ");
+
+        $stmt->execute([
+            ':id' => $autorId,
+            ':user_id' => $usuarioId
+        ]);
+    }
+
+    header('Location: authors.php');
+    exit();
+}
+
+/*
+|--------------------------------------------------------------------------
+| READ - LISTAR AUTORES
 |--------------------------------------------------------------------------
 */
 
@@ -123,7 +155,6 @@ $authors = $stmt->fetchAll();
 
 <body>
 
-    <!-- SIDEBAR -->
     <nav class="sidebar">
         <div class="sidebar-header">
             <h2>ShelfHub</h2>
@@ -137,23 +168,24 @@ $authors = $stmt->fetchAll();
             <a href="reviews.php" class="menu-item">Reviews</a>
             <a href="posts.php" class="menu-item">Posts</a>
         </div>
+
+        <form action="logout.php" method="POST">
+            <button type="submit" class="logout-btn">Sair do Sistema</button>
+        </form>
+
     </nav>
 
-    <!-- LOGO FUNDO -->
     <div class="background-logo">
         <img src="../img/logo.png" alt="Logo ShelfHub">
     </div>
 
-    <!-- CONTEÚDO -->
     <main class="page-wrapper">
-
         <div class="hero">
             <h1>Autores</h1>
             <p class="subtitle">Cadastre autores da sua biblioteca pessoal.</p>
         </div>
 
         <div class="container">
-            <!-- FORM -->
             <div class="card">
                 <h2 class="card-title">Novo Autor</h2>
                 <?php if ($mensagem): ?>
@@ -180,56 +212,49 @@ $authors = $stmt->fetchAll();
                         <textarea name="bio" placeholder="Digite a biografia"></textarea>
                     </div>
 
-                    <button type="submit" class="submit-btn">Cadastrar Autor</button>
-
+                    <button type="submit" class="submit-btn">
+                        Cadastrar Autor
+                    </button>
                 </form>
-
             </div>
 
-            <!-- AUTORES -->
             <div class="authors-grid">
-
                 <?php if (count($authors) > 0): ?>
                     <?php foreach ($authors as $author): ?>
-
                         <div class="author-card">
                             <div class="author-name" onclick="togglePhoto('foto<?= $author['id'] ?>')">
                                 <?= htmlspecialchars($author['name']) ?>
                             </div>
 
                             <?php if ($author['photo']): ?>
-                                <img id="foto<?= $author['id'] ?>" src="uploads/authors/<?= htmlspecialchars($author['photo']) ?>" class="author-photo" alt="Foto do autor">
+                                <img
+                                    id="foto<?= $author['id'] ?>" src="uploads/authors/<?= htmlspecialchars($author['photo']) ?>" class="author-photo" alt="Foto do autor">
                             <?php endif; ?>
 
                             <div class="author-bio">
                                 <?= nl2br(htmlspecialchars($author['bio'])) ?>
                             </div>
+                            <a href="?deletar=<?= $author['id'] ?>" class="delete-btn" onclick="return confirm('Deseja realmente excluir este autor?')"> Excluir </a>              
                         </div>
-
                     <?php endforeach; ?>
 
                 <?php else: ?>
                     <p class="empty">Nenhum autor cadastrado ainda.</p>
                 <?php endif; ?>
             </div>
-
         </div>
-
     </main>
 
     <script>
         function togglePhoto(id) {
-
             const foto = document.getElementById(id);
             if (!foto) return;
             if (foto.style.display === 'block') {
                 foto.style.display = 'none';
-
             } else {
                 foto.style.display = 'block';
             }
         }
     </script>
-
 </body>
 </html>
