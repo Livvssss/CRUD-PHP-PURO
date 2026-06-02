@@ -29,7 +29,7 @@ $usuarioNome = $_SESSION['usuario_nome'];
             </div>
 
             <nav class="sidebar-menu">
-                <a href="books.php" class="menu-item active"> Livros </a>
+                <a href="../dashboard.php" class="menu-item">Início</a>
                 <a href="pages/authors.php" class="menu-item"> Autores </a>
                 <a href="pages/shelves.php" class="menu-item"> Estantes </a>
                 <a href="pages/reviews.php" class="menu-item"> Reviews </a>
@@ -58,10 +58,6 @@ $usuarioNome = $_SESSION['usuario_nome'];
         </div>
 
         <section class="cards">
-            <div class="card">
-                <h2 class="card-title"> Livros </h2>
-                <p class="card-text"> Gerencie todos os livros cadastrados no sistema. </p>
-            </div>
 
             <div class="card">
                 <h2 class="card-title"> Autores </h2>
@@ -76,6 +72,11 @@ $usuarioNome = $_SESSION['usuario_nome'];
             <div class="card">
                 <h2 class="card-title"> Reviews </h2>                   
                 <p class="card-text"> Visualize avaliações e comentários dos leitores. </p>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title"> Posts </h2>
+                <p class="card-text"> Gerencie todos os posts feitos no sistema. </p>
             </div>
 
         </section>

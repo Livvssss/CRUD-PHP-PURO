@@ -117,7 +117,7 @@ body::before {
     box-shadow: 0 14px 24px rgba(217, 119, 6, 0.15);
 }
 
-.delete-btn {
+.logout-btn {
     width: 100%;
     border: none;
     background: rgba(239, 68, 68, 0.08);
@@ -130,7 +130,7 @@ body::before {
     transition: var(--transition);
 }
 
-.delete-btn:hover {
+.logout-btn:hover {
     background: rgba(239, 68, 68, 0.14);
     transform: translateY(-2px);
 }
