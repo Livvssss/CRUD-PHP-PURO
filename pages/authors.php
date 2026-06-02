@@ -170,7 +170,7 @@ $authors = $stmt->fetchAll();
         </div>
 
         <form action="logout.php" method="POST">
-            <button type="submit" class="logout-btn">Sair do Sistema</button>
+            <button type="submit" class="delete-btn">Sair do Sistema</button>
         </form>
 
     </nav>

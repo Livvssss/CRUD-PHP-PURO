@@ -20,7 +20,7 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     min-height: 100vh;
     background: linear-gradient(135deg, var(--bg), var(--bg-soft));
     display: flex;
@@ -30,12 +30,16 @@ body {
 }
 
 body::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at top left, rgba(251, 191, 36, 0.10), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.08), transparent 35%);
+        radial-gradient(circle at top left,
+            rgba(251, 191, 36, 0.1),
+            transparent 30%),
+        radial-gradient(circle at bottom right,
+            rgba(245, 158, 11, 0.08),
+            transparent 35%);
     z-index: -2;
 }
 
@@ -111,6 +115,24 @@ body::before {
     background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     box-shadow: 0 14px 24px rgba(217, 119, 6, 0.15);
+}
+
+.delete-btn {
+    width: 100%;
+    border: none;
+    background: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
+    padding: 16px 18px;
+    border-radius: 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.delete-btn:hover {
+    background: rgba(239, 68, 68, 0.14);
+    transform: translateY(-2px);
 }
 
 /* CONTEÚDO */
@@ -193,7 +215,7 @@ textarea {
 input:focus,
 textarea:focus {
     border-color: #f59e0b;
-    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.10);
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
 }
 
 textarea {
@@ -287,23 +309,6 @@ textarea {
     color: var(--text-muted);
     line-height: 1.8;
     font-size: 14px;
-}
-
-.delete-btn{
-    display: inline-block;
-    margin-top: 12px;
-    padding: 10px 16px;
-    background: #ff4d4d;
-    color: white;
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: 0.2s;
-}
-
-.delete-btn:hover{
-    background: #e63939;
-    transform: translateY(-2px);
 }
 
 .empty {
