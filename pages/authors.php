@@ -230,7 +230,7 @@ $authors = $stmt->fetchAll();
                             <div class="author-bio">
                                 <?= nl2br(htmlspecialchars($author['bio'])) ?>
                             </div>
-                            <a href="?deletar=<?= $author['id'] ?>" class="delete-btn" onclick="return confirm('Deseja realmente excluir este autor?')"> Excluir </a>              
+                            <a href="?deletar=<?= $author['id'] ?>" class="delete-author-btn" onclick="return confirm('Deseja realmente excluir este autor?')"> Excluir </a>              
                         </div>
                     <?php endforeach; ?>
 

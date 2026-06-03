@@ -125,7 +125,6 @@ body::before {
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
-    
 }
 
 .logout-btn:hover {
@@ -241,6 +240,23 @@ textarea {
 
 .submit-btn:hover {
     transform: translateY(-3px);
+}
+
+.delete-author-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: #ef4444;
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.delete-author-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
 }
 
 .message {
