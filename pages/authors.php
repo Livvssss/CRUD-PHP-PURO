@@ -169,15 +169,11 @@ $authors = $stmt->fetchAll();
             <a href="posts.php" class="menu-item">Posts</a>
         </div>
 
-        <form action="logout.php" method="POST">
+        <form action="/logout.php" method="POST">
             <button type="submit" class="logout-btn">Sair do Sistema</button>
         </form>
 
     </nav>
-
-    <div class="background-logo">
-        <img src="../img/logo.png" alt="Logo ShelfHub">
-    </div>
 
     <main class="page-wrapper">
         <div class="hero">

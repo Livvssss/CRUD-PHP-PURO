@@ -43,21 +43,6 @@ body::before {
     z-index: -2;
 }
 
-.background-logo {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0.05;
-    z-index: -1;
-}
-
-.background-logo img {
-    width: 650px;
-    max-width: 90%;
-}
-
 /* SIDEBAR */
 
 .sidebar {
@@ -70,10 +55,14 @@ body::before {
     position: fixed;
     left: 0;
     top: 0;
-
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+}
+
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar form {
@@ -136,6 +125,7 @@ body::before {
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    
 }
 
 .logout-btn:hover {
