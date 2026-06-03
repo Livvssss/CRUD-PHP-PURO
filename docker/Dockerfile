@@ -4,4 +4,10 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql
 
 RUN a2enmod rewrite
 
+COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
+
 WORKDIR /var/www/html
+
+COPY . .
+
+EXPOSE 80
