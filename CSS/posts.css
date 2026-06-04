@@ -1,3 +1,7 @@
+/* ============================================================
+    VARIÁVEIS GLOBAIS
+    Paleta de cores, tamanhos e efeitos reutilizáveis
+   ============================================================ */
 :root {
     --bg: #fffcf2;
     --bg-soft: #fef9e7;
@@ -13,14 +17,22 @@
     --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ============================================================
+    RESET BÁSICO
+    Remove margens e paddings padrão do navegador
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* ============================================================
+    BODY
+    Layout base com fundo gradiente suave
+   ============================================================ */
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     min-height: 100vh;
     background: linear-gradient(135deg, var(--bg), var(--bg-soft));
     display: flex;
@@ -28,16 +40,27 @@ body {
     overflow-x: hidden;
 }
 
+/* Camada decorativa de gradientes radiais no fundo */
 body::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at top left, rgba(251, 191, 36, 0.10), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.08), transparent 35%);
+        radial-gradient(circle at top left,
+            rgba(251, 191, 36, 0.1),
+            transparent 30%),
+        radial-gradient(circle at bottom right,
+            rgba(245, 158, 11, 0.08),
+            transparent 35%);
     z-index: -1;
 }
 
+/* ============================================================
+    SIDEBAR
+    Menu lateral fixo com efeito de vidro
+    Usa justify-content: space-between para empurrar o
+    botão de logout para o rodapé
+   ============================================================ */
 .sidebar {
     width: var(--sidebar-width);
     min-height: 100vh;
@@ -53,11 +76,38 @@ body::before {
     justify-content: space-between;
 }
 
+/* Agrupa logo + menu no topo da sidebar */
 .sidebar-top {
     display: flex;
     flex-direction: column;
 }
 
+/* ============================================================
+    BOTÃO DE LOGOUT
+    Fica fixo no rodapé da sidebar
+   ============================================================ */
+.logout-btn {
+    width: 100%;
+    border: none;
+    background: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
+    padding: 16px 18px;
+    border-radius: 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.14);
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+    LOGO E SUBTÍTULO
+    Nome do sistema no topo da sidebar
+   ============================================================ */
 .logo {
     font-size: 34px;
     font-weight: 800;
@@ -71,12 +121,17 @@ body::before {
     margin-bottom: 40px;
 }
 
+/* ============================================================
+    MENU DE NAVEGAÇÃO
+    Links do menu lateral
+   ============================================================ */
 .sidebar-menu {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
+/* Item de menu padrão */
 .menu-item {
     text-decoration: none;
     color: var(--text);
@@ -92,35 +147,48 @@ body::before {
     transform: translateX(4px);
 }
 
+/* Item de menu ativo (página atual) */
 .menu-item.active {
     background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     box-shadow: 0 14px 24px rgba(217, 119, 6, 0.15);
 }
 
+/* ============================================================
+    CONTEÚDO PRINCIPAL
+    Área à direita da sidebar
+   ============================================================ */
 .main-content {
     margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
     padding: 40px;
 }
 
-.delete-btn{
-    display:inline-block;
-    margin-top:12px;
-    padding:10px 16px;
-    background:#ff4d4d;
-    color:#fff;
-    text-decoration:none;
-    border-radius:10px;
-    font-weight:600;
-    transition:.2s;
+/* ============================================================
+    BOTÃO DE EXCLUIR
+    Aparece em cada post para deletar o item
+   ============================================================ */
+.delete-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: #ff4d4d;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: 0.2s;
 }
 
-.delete-btn:hover{
-    background:#e63939;
-    transform:translateY(-2px);
+.delete-btn:hover {
+    background: #e63939;
+    transform: translateY(-2px);
 }
 
+/* ============================================================
+    TOPBAR
+    Título e subtítulo da página
+   ============================================================ */
 .topbar {
     margin-bottom: 40px;
 }
@@ -136,6 +204,10 @@ body::before {
     margin-top: 8px;
 }
 
+/* ============================================================
+    CARD
+    Container para formulários e conteúdo
+   ============================================================ */
 .card {
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -151,6 +223,10 @@ body::before {
     margin-bottom: 24px;
 }
 
+/* ============================================================
+    FORMULÁRIO
+    Grupos de campos e inputs
+   ============================================================ */
 .form-group {
     margin-bottom: 20px;
 }
@@ -177,6 +253,7 @@ textarea {
     min-height: 140px;
 }
 
+/* Botão de envio do formulário */
 .submit-btn {
     width: 100%;
     border: none;
@@ -188,6 +265,10 @@ textarea {
     cursor: pointer;
 }
 
+/* ============================================================
+    MENSAGENS DE FEEDBACK
+    Sucesso (verde) e erro (vermelho)
+   ============================================================ */
 .message {
     background: #dcfce7;
     color: #166534;
@@ -204,6 +285,10 @@ textarea {
     margin-bottom: 20px;
 }
 
+/* ============================================================
+    LISTA DE POSTS
+    Container e cards individuais de cada post
+   ============================================================ */
 .posts {
     display: flex;
     flex-direction: column;
@@ -219,6 +304,7 @@ textarea {
     box-shadow: var(--shadow);
 }
 
+/* Linha com capa do livro + título + progresso */
 .book-info {
     display: flex;
     align-items: center;
@@ -226,6 +312,7 @@ textarea {
     margin-bottom: 20px;
 }
 
+/* Capa do livro em miniatura */
 .book-cover {
     width: 80px;
     height: 110px;
@@ -238,6 +325,7 @@ textarea {
     font-weight: 700;
 }
 
+/* Badge com o progresso de leitura */
 .progress {
     display: inline-block;
     margin-top: 8px;
@@ -249,36 +337,15 @@ textarea {
     font-weight: 700;
 }
 
+/* Texto do comentário */
 .post-content {
     line-height: 1.8;
     color: #52525b;
 }
 
+/* Data de publicação */
 .post-date {
     margin-top: 18px;
     color: var(--text-muted);
     font-size: 14px;
-}
-
-@media(max-width:900px) {
-
-    body {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        position: relative;
-        width: 100%;
-        min-height: auto;
-    }
-
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-    }
-
-    .book-info {
-        flex-direction: column;
-        align-items: flex-start;
-    }
 }

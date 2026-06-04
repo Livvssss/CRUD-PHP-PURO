@@ -155,25 +155,27 @@ $authors = $stmt->fetchAll();
 
 <body>
 
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <h2>ShelfHub</h2>
-            <p>Sistema de Biblioteca</p>
-        </div>
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div>
+                <h1 class="logo">ShelfHub</h1>
+                <p class="logo-subtitle">Sistema de Biblioteca</p>
+            </div>
 
-        <div class="sidebar-menu">
-            <a href="../dashboard.php" class="menu-item">Início</a>
-            <a href="authors.php" class="menu-item active">Autores</a>
-            <a href="shelves.php" class="menu-item">Estantes</a>
-            <a href="reviews.php" class="menu-item">Reviews</a>
-            <a href="posts.php" class="menu-item">Posts</a>
+            <nav class="sidebar-menu">
+                <a href="../dashboard.php" class="menu-item">Início</a>
+                <a href="authors.php" class="menu-item active">Autores</a>
+                <a href="shelves.php" class="menu-item">Estantes</a>
+                <a href="reviews.php" class="menu-item">Reviews</a>
+                <a href="posts.php" class="menu-item">Posts</a>
+            </nav>
         </div>
 
         <form action="/logout.php" method="POST">
             <button type="submit" class="logout-btn">Sair do Sistema</button>
         </form>
 
-    </nav>
+    </aside>
 
     <main class="page-wrapper">
         <div class="hero">

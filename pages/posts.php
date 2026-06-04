@@ -154,11 +154,12 @@ $posts = $stmt->fetchAll();
                 <a href="#" class="menu-item active">Posts</a>
             </nav>
 
-            <form action="logout.php" method="POST">
-                <button type="submit" class="logout-btn">Sair do Sistema</button>
-            </form>
-
         </div>
+
+        <form action="/logout.php" method="POST">
+            <button type="submit" class="logout-btn">Sair do Sistema</button>
+        </form>
+
     </aside>
 
     <main class="main-content">

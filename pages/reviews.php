@@ -144,18 +144,22 @@ $reviews = $stmt->fetchAll();
 <body>
 
     <aside class="sidebar">
-        <h1 class="logo">ShelfHub</h1>
-        <p class="logo-subtitle">Sistema de Biblioteca</p>
+        <div class="sidebar-top">
+            <div>
+                <h1 class="logo">ShelfHub</h1>
+                <p class="logo-subtitle">Sistema de Biblioteca</p>
+            </div>
 
-        <nav class="sidebar-menu">
-            <a href="../dashboard.php" class="menu-item">Início</a>
-            <a href="authors.php" class="menu-item">Autores</a>
-            <a href="shelves.php" class="menu-item">Estantes</a>
-            <a href="#" class="menu-item active">Reviews</a>
-            <a href="posts.php" class="menu-item">Posts</a>
-        </nav>
+            <nav class="sidebar-menu">
+                <a href="../dashboard.php" class="menu-item">Início</a>
+                <a href="authors.php" class="menu-item">Autores</a>
+                <a href="shelves.php" class="menu-item">Estantes</a>
+                <a href="#" class="menu-item active">Reviews</a>
+                <a href="posts.php" class="menu-item">Posts</a>
+            </nav>
+        </div>
 
-        <form action="logout.php" method="POST">
+        <form action="/logout.php" method="POST">
             <button type="submit" class="logout-btn">Sair do Sistema</button>
         </form>
 

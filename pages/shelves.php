@@ -236,7 +236,7 @@ $books = $stmt->fetchAll();
             </nav>
         </div>
 
-        <form action="logout.php" method="POST">
+        <form action="/logout.php" method="POST">
             <button type="submit" class="logout-btn">Sair do Sistema</button>
         </form>
     </aside>
