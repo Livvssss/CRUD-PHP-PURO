@@ -1,3 +1,7 @@
+/* ============================================================
+    VARIÁVEIS GLOBAIS
+    Paleta de cores, tamanhos e efeitos reutilizáveis
+   ============================================================ */
 :root {
     --bg: #fffcf2;
     --bg-soft: #fef9e7;
@@ -13,12 +17,20 @@
     --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ============================================================
+    RESET BÁSICO
+    Remove margens e paddings padrão do navegador
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* ============================================================
+    BODY
+    Layout base com fundo gradiente suave
+   ============================================================ */
 body {
     font-family: "Poppins", sans-serif;
     min-height: 100vh;
@@ -28,6 +40,7 @@ body {
     overflow-x: hidden;
 }
 
+/* Camada decorativa de gradientes radiais no fundo */
 body::before {
     content: "";
     position: fixed;
@@ -42,8 +55,12 @@ body::before {
     z-index: -1;
 }
 
-/* SIDEBAR */
-
+/* ============================================================
+    SIDEBAR
+    Menu lateral fixo com efeito de vidro
+    Usa justify-content: space-between para empurrar o
+    botão de logout para o rodapé
+   ============================================================ */
 .sidebar {
     width: var(--sidebar-width);
     min-height: 100vh;
@@ -59,11 +76,16 @@ body::before {
     justify-content: space-between;
 }
 
+/* Agrupa logo + menu no topo da sidebar */
 .sidebar-top {
     display: flex;
     flex-direction: column;
 }
 
+/* ============================================================
+    LOGO E SUBTÍTULO
+    Nome do sistema no topo da sidebar
+   ============================================================ */
 .logo {
     font-size: 34px;
     font-weight: 800;
@@ -77,12 +99,17 @@ body::before {
     margin-bottom: 40px;
 }
 
+/* ============================================================
+    MENU DE NAVEGAÇÃO
+    Links do menu lateral
+   ============================================================ */
 .sidebar-menu {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
+/* Item de menu padrão */
 .menu-item {
     text-decoration: none;
     color: var(--text);
@@ -98,12 +125,17 @@ body::before {
     transform: translateX(4px);
 }
 
+/* Item de menu ativo (página atual) */
 .menu-item.active {
     background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     box-shadow: 0 14px 24px rgba(217, 119, 6, 0.15);
 }
 
+/* ============================================================
+    BOTÃO DE LOGOUT
+    Fica fixo no rodapé da sidebar
+   ============================================================ */
 .logout-btn {
     width: 100%;
     border: none;
@@ -122,13 +154,20 @@ body::before {
     transform: translateY(-2px);
 }
 
-/* MAIN */
+/* ============================================================
+    CONTEÚDO PRINCIPAL
+    Área à direita da sidebar
+   ============================================================ */
 .main-content {
     margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
     padding: 40px;
 }
 
+/* ============================================================
+    TOPBAR
+    Barra superior com saudação ao usuário e badge de perfil
+   ============================================================ */
 .topbar {
     display: flex;
     justify-content: space-between;
@@ -146,6 +185,7 @@ body::before {
     color: var(--text-muted);
 }
 
+/* Badge com o nome do sistema no canto superior direito */
 .profile-badge {
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid var(--border);
@@ -155,7 +195,10 @@ body::before {
     box-shadow: var(--shadow);
 }
 
-/* LOGO */
+/* ============================================================
+    LOGO CENTRAL
+    Imagem do logo exibida no centro da dashboard
+   ============================================================ */
 .logo-container {
     width: 100%;
     display: flex;
@@ -172,14 +215,18 @@ body::before {
     opacity: 0.95;
 }
 
-/* CARDS */
-
+/* ============================================================
+    GRID DE CARDS
+    Exibe os módulos do sistema (Autores, Estantes, etc.)
+    em colunas responsivas
+   ============================================================ */
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 22px;
 }
 
+/* Card individual com efeito glassmorphism */
 .card {
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -190,6 +237,7 @@ body::before {
     transition: var(--transition);
 }
 
+/* Card sobe levemente ao passar o mouse */
 .card:hover {
     transform: translateY(-6px);
     box-shadow: 0 24px 40px rgba(217, 119, 6, 0.12);

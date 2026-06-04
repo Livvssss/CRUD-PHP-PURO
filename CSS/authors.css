@@ -1,3 +1,6 @@
+/* ============================================================
+    VARIÁVEIS GLOBAIS
+   ============================================================ */
 :root {
     --bg: #fffcf2;
     --bg-soft: #fef9e7;
@@ -13,12 +16,18 @@
     --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ============================================================
+    RESET
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* ============================================================
+    BODY
+   ============================================================ */
 body {
     font-family: "Poppins", sans-serif;
     min-height: 100vh;
@@ -34,17 +43,14 @@ body::before {
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at top left,
-            rgba(251, 191, 36, 0.1),
-            transparent 30%),
-        radial-gradient(circle at bottom right,
-            rgba(245, 158, 11, 0.08),
-            transparent 35%);
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.1), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.08), transparent 35%);
     z-index: -2;
 }
 
-/* SIDEBAR */
-
+/* ============================================================
+    SIDEBAR
+   ============================================================ */
 .sidebar {
     width: var(--sidebar-width);
     min-height: 100vh;
@@ -69,6 +75,25 @@ body::before {
     width: 100%;
 }
 
+/* ============================================================
+    LOGO
+   ============================================================ */
+.logo {
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.logo-subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 40px;
+}
+
+/* ============================================================
+    MENU
+   ============================================================ */
 .sidebar-menu {
     display: flex;
     flex-direction: column;
@@ -96,6 +121,9 @@ body::before {
     box-shadow: 0 14px 24px rgba(217, 119, 6, 0.15);
 }
 
+/* ============================================================
+    LOGOUT
+   ============================================================ */
 .logout-btn {
     width: 100%;
     border: none;
@@ -114,44 +142,48 @@ body::before {
     transform: translateY(-2px);
 }
 
-.logo {
-    font-size: 34px;
-    font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 8px;
-}
-
-.logo-subtitle {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 40px;
-}
-
-/* CONTEÚDO */
-
+/* ============================================================
+    CONTEÚDO PRINCIPAL
+   ============================================================ */
 .page-wrapper {
     margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
     padding: 40px;
 }
 
-.hero {
+/* ============================================================
+    TOPBAR
+   ============================================================ */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 40px;
-    text-align: center;
 }
 
-.hero h1 {
-    font-size: 54px;
+.welcome h1 {
+    font-size: 38px;
     font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 12px;
 }
 
-.subtitle {
+.welcome p {
+    margin-top: 8px;
     color: var(--text-muted);
-    font-size: 16px;
+    font-size: 14px;
 }
 
+.profile-badge {
+    background: rgba(255, 255, 255, 0.60);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+}
+
+/* ============================================================
+    CONTAINER — grid dois colunas
+   ============================================================ */
 .container {
     display: grid;
     grid-template-columns: 400px 1fr;
@@ -159,6 +191,9 @@ body::before {
     align-items: start;
 }
 
+/* ============================================================
+    CARD
+   ============================================================ */
 .card {
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -181,6 +216,9 @@ body::before {
     margin-bottom: 24px;
 }
 
+/* ============================================================
+    FORMULÁRIO
+   ============================================================ */
 .form-group {
     margin-bottom: 22px;
 }
@@ -189,6 +227,7 @@ label {
     display: block;
     margin-bottom: 10px;
     font-weight: 700;
+    font-size: 14px;
 }
 
 input,
@@ -201,7 +240,13 @@ textarea {
     font-family: inherit;
     font-size: 15px;
     outline: none;
+    color: var(--text);
     transition: var(--transition);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted);
 }
 
 input:focus,
@@ -215,6 +260,9 @@ textarea {
     min-height: 140px;
 }
 
+/* ============================================================
+    BOTÕES DO FORMULÁRIO
+   ============================================================ */
 .submit-btn {
     width: 100%;
     border: none;
@@ -233,23 +281,30 @@ textarea {
     transform: translateY(-3px);
 }
 
-.delete-author-btn {
-    display: inline-block;
+/* Botão cancelar (link <a>) — aparece no modo edição */
+.cancel-btn {
+    display: block;
+    width: 100%;
     margin-top: 12px;
-    padding: 10px 16px;
-    background: #ef4444;
-    color: white;
+    padding: 16px;
+    background: #f4f4f5;
+    color: var(--text);
+    border-radius: 18px;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
     text-decoration: none;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: .3s;
+    transition: var(--transition);
 }
 
-.delete-author-btn:hover {
-    background: #dc2626;
+.cancel-btn:hover {
+    background: #e4e4e7;
     transform: translateY(-2px);
 }
 
+/* ============================================================
+    MENSAGENS DE FEEDBACK
+   ============================================================ */
 .message {
     background: #dcfce7;
     color: #166534;
@@ -257,6 +312,7 @@ textarea {
     border-radius: 16px;
     margin-bottom: 20px;
     font-weight: 600;
+    border-left: 4px solid #22c55e;
 }
 
 .error {
@@ -266,10 +322,12 @@ textarea {
     border-radius: 16px;
     margin-bottom: 20px;
     font-weight: 600;
+    border-left: 4px solid #ef4444;
 }
 
-/* AUTORES */
-
+/* ============================================================
+    GRID DE AUTORES
+   ============================================================ */
 .authors-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -284,6 +342,8 @@ textarea {
     padding: 28px;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    display: flex;
+    flex-direction: column;
 }
 
 .author-card:hover {
@@ -318,21 +378,61 @@ textarea {
     color: var(--text-muted);
     line-height: 1.8;
     font-size: 14px;
+    margin-bottom: 16px;
+    flex-grow: 1;
 }
 
+/* ============================================================
+    BOTÕES DE AÇÃO DO CARD
+   ============================================================ */
+.edit-author-btn,
+.delete-author-btn {
+    display: inline-block;
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+}
+
+.edit-author-btn {
+    background: var(--primary-soft);
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.edit-author-btn:hover {
+    background: #fde68a;
+    transform: translateY(-2px);
+}
+
+.delete-author-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-author-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+    EMPTY STATE
+   ============================================================ */
 .empty {
     color: var(--text-muted);
     font-size: 16px;
 }
 
+/* ============================================================
+    ANIMAÇÕES
+   ============================================================ */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }

@@ -245,8 +245,8 @@ $books = $stmt->fetchAll();
         <div class="topbar">
 
             <div class="welcome">
-                <h1>Minha Estante</h1>
-                <p>Olá, <?= htmlspecialchars($usuarioNome) ?>. Organize e gerencie suas leituras.</p>
+                <h1>Estantes</h1>
+                <p>Olá, <?= htmlspecialchars($usuarioNome) ?>. Organize e gerencie os livros em sua estante.</p>
             </div>
 
             <div class="profile-badge">ShelfHub</div>

@@ -1,47 +1,30 @@
 <?php
 session_start();
-
 if (isset($_SESSION['usuario_id'])) {
     header('Location: /dashboard.php');
     exit();
 }
-
 require_once __DIR__ . '/config/database.php';
-
 $erro = '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
-
     if (empty($email) || empty($password)) {
-
         $erro = 'Preencha todos os campos.';
-
     } else {
-
         $pdo = getConexao();
-
         $stmt = $pdo->prepare("SELECT id, name, email, password FROM users WHERE email = :email LIMIT 1");
-
         $stmt->execute([
             ':email' => $email
         ]);
-
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($usuario && password_verify($password, $usuario['password'])) {
-
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['name'];
             $_SESSION['usuario_email'] = $usuario['email'];
-
             header('Location: /dashboard.php');
             exit();
-
         } else {
-
             $erro = 'E-mail ou senha inválidos.';
         }
     }
@@ -92,12 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Não possui conta?
                     <a href="register.php">Criar conta</a>
                 </p>
-
             </form>
             <p class="footer-text"> ShelfHub © 2026 </p>
         </div>
-
-    </div>
-    
+    </div> 
 </body>
 </html>

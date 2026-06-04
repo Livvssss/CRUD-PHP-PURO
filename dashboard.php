@@ -1,11 +1,9 @@
 <?php
 session_start();
-
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: login.php');
     exit();
 }
-
 $usuarioNome = $_SESSION['usuario_nome'];
 ?>
 
@@ -71,16 +69,14 @@ $usuarioNome = $_SESSION['usuario_nome'];
 
             <div class="card">
                 <h2 class="card-title"> Reviews </h2>                   
-                <p class="card-text"> Visualize avaliações e comentários dos leitores. </p>
+                <p class="card-text"> Visualize suas avaliações e comentários. </p>
             </div>
 
             <div class="card">
                 <h2 class="card-title"> Posts </h2>
-                <p class="card-text"> Gerencie todos os posts feitos no sistema. </p>
+                <p class="card-text"> Gerencie todos os seus posts feitos. </p>
             </div>
-
         </section>
-
     </main>
 </body>
 </html>

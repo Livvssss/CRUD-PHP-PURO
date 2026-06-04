@@ -1,3 +1,7 @@
+/* ============================================================
+    VARIÁVEIS GLOBAIS
+    Paleta de cores, bordas e transições reutilizáveis
+   ============================================================ */
 :root {
     --bg: #fffcf2;
     --bg-soft: #fef9e7;
@@ -10,12 +14,22 @@
     --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ============================================================
+    RESET BÁSICO
+    Remove margens e paddings padrão do navegador
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* ============================================================
+    BODY
+    Centraliza o card de login na tela
+    O logo do sistema aparece como fundo com uma camada
+    translúcida por cima para não atrapalhar a leitura
+   ============================================================ */
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     min-height: 100vh;
@@ -33,6 +47,7 @@ body {
     background-attachment: fixed;
 }
 
+/* Camada decorativa de gradientes radiais no fundo */
 body::before {
     content: '';
     position: fixed;
@@ -43,12 +58,21 @@ body::before {
     z-index: -1;
 }
 
+/* ============================================================
+    CONTAINER DO LOGIN
+    Limita a largura máxima do card e centraliza na tela
+   ============================================================ */
 .login-container {
     width: 100%;
     max-width: 470px;
     padding: 24px;
 }
 
+/* ============================================================
+    CARD DE LOGIN
+    Efeito de vidro com sombra suave
+    Entra na tela com animação fadeIn
+   ============================================================ */
 .login-card {
     background: var(--surface);
     border: 1px solid rgba(255,255,255,0.25);
@@ -61,6 +85,10 @@ body::before {
     animation: fadeIn .7s ease;
 }
 
+/* ============================================================
+    ÁREA DO LOGO
+    Nome do sistema e subtítulo no topo do card
+   ============================================================ */
 .logo-area {
     text-align: center;
     margin-bottom: 36px;
@@ -80,6 +108,10 @@ body::before {
     font-weight: 500;
 }
 
+/* ============================================================
+    MENSAGEM DE ERRO
+    Aparece quando login falha (usuário ou senha incorretos)
+   ============================================================ */
 .error-box {
     background: rgba(254, 226, 226, 0.65);
     color: #991b1b;
@@ -91,6 +123,10 @@ body::before {
     font-weight: 600;
 }
 
+/* ============================================================
+    FORMULÁRIO
+    Grupos de label + input
+   ============================================================ */
 .form-group {
     margin-bottom: 22px;
 }
@@ -103,6 +139,7 @@ body::before {
     font-weight: 700;
 }
 
+/* Campo de input com fundo translúcido */
 .input {
     width: 100%;
     padding: 16px 18px;
@@ -115,12 +152,17 @@ body::before {
     transition: var(--transition);
 }
 
+/* Input em foco: fundo mais opaco e borda laranja */
 .input:focus {
     background: rgba(255,255,255,0.52);
     border-color: rgba(217,119,6,0.40);
     box-shadow: 0 0 0 4px rgba(217,119,6,0.10);
 }
 
+/* ============================================================
+    BOTÃO DE LOGIN
+    Gradiente laranja com efeito de elevação no hover
+   ============================================================ */
 .btn-login {
     width: 100%;
     border: none;
@@ -139,6 +181,10 @@ body::before {
     box-shadow: 0 14px 24px rgba(217,119,6,0.20);
 }
 
+/* ============================================================
+    LINK DE CADASTRO
+    Fica abaixo do botão para redirecionar novos usuários
+   ============================================================ */
 .register-link {
     margin-top: 22px;
     text-align: center;
@@ -156,6 +202,10 @@ body::before {
     text-decoration: underline;
 }
 
+/* ============================================================
+    RODAPÉ
+    Texto informativo abaixo do card
+   ============================================================ */
 .footer-text {
     text-align: center;
     margin-top: 24px;
@@ -164,6 +214,10 @@ body::before {
     font-weight: 500;
 }
 
+/* ============================================================
+    ANIMAÇÃO DE ENTRADA
+    Card sobe suavemente ao carregar a página
+   ============================================================ */
 @keyframes fadeIn {
     from {
         opacity: 0;
