@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group">
                     <label class="form-label">Confirmar senha</label>
-                    <input type="password" name="confirmPassword" class="input" placeholder="Confirme sua senha">
+                    <input type="password" name="confirmar_password" class="input" placeholder="Confirme sua senha">
                 </div>
 
                 <button type="submit" class="btn"> Criar conta </button>

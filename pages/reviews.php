@@ -214,7 +214,7 @@ $reviews = $stmt->fetchAll();
                     <div class="form-group">
                         <label>Nota</label>
                         <input type="number" step="0.5" min="0" max="5" name="nota"
-                               value="<?= htmlspecialchars($reviewEditando['rating'] ?? '') ?>">
+                            value="<?= htmlspecialchars($reviewEditando['rating'] ?? '') ?>">
                     </div>
 
                     <div class="form-group">
@@ -280,8 +280,8 @@ $reviews = $stmt->fetchAll();
 
                     <?php if ($review['book_cover']): ?>
                         <img src="uploads/books/<?= htmlspecialchars($review['book_cover']) ?>"
-                             class="review-cover"
-                             alt="Capa de <?= htmlspecialchars($review['book_title']) ?>">
+                            class="review-cover"
+                            alt="Capa de <?= htmlspecialchars($review['book_title']) ?>">
                     <?php endif; ?>
 
                     <div class="review-content">

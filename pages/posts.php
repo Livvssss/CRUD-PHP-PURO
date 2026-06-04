@@ -204,7 +204,7 @@ $posts = $stmt->fetchAll();
                     <div class="form-group">
                         <label>Em que parte da leitura você está?</label>
                         <input type="text" name="reading_progress"
-                               value="<?= htmlspecialchars($postEditando['reading_progress']) ?>">
+                            value="<?= htmlspecialchars($postEditando['reading_progress']) ?>">
                     </div>
 
                     <div class="form-group">
@@ -266,8 +266,8 @@ $posts = $stmt->fetchAll();
                     <div class="book-info">
                         <?php if ($post['cover']): ?>
                             <img src="uploads/books/<?= htmlspecialchars($post['cover']) ?>"
-                                 class="book-cover"
-                                 alt="Capa de <?= htmlspecialchars($post['title']) ?>">
+                                class="book-cover"
+                                alt="Capa de <?= htmlspecialchars($post['title']) ?>">
                         <?php endif; ?>
                         <div>
                             <div class="book-title"><?= htmlspecialchars($post['title']) ?></div>
