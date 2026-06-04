@@ -9,6 +9,7 @@ $usuarioNome = $_SESSION['usuario_nome'];
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +19,12 @@ $usuarioNome = $_SESSION['usuario_nome'];
 </head>
 
 <body>
+
+    <!-- Envelope overlay (abre ao entrar na dashboard) -->
+    <div class="envelope-overlay closed" id="envelopeOverlay">
+        <div class="envelope-top"></div>
+        <div class="envelope-body"></div>
+    </div>
 
     <aside class="sidebar">
         <div class="sidebar-top">
@@ -68,7 +75,7 @@ $usuarioNome = $_SESSION['usuario_nome'];
             </div>
 
             <div class="card">
-                <h2 class="card-title"> Reviews </h2>                   
+                <h2 class="card-title"> Reviews </h2>
                 <p class="card-text"> Visualize suas avaliações e comentários. </p>
             </div>
 
@@ -78,5 +85,28 @@ $usuarioNome = $_SESSION['usuario_nome'];
             </div>
         </section>
     </main>
+    <script>
+        const overlay = document.getElementById('envelopeOverlay');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            overlay.classList.remove('closed');
+            overlay.classList.add('opening');
+
+            // Espera as duas animações (top + body) terminarem
+            let count = 0;
+            overlay.querySelectorAll('.envelope-top, .envelope-body')
+                .forEach(el => {
+                    el.addEventListener('animationend', () => {
+                        count++;
+                        if (count === 2) {
+                            overlay.style.display = 'none';
+                        }
+                    }, {
+                        once: true
+                    });
+                });
+        });
+    </script>
 </body>
+
 </html>

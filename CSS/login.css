@@ -229,3 +229,138 @@ body::before {
         transform: translateY(0);
     }
 }
+
+/* ============================================================
+    BOTÃO VOLTAR
+    Canto superior esquerdo, com ícone de seta
+   ============================================================ */
+.back-btn {
+    position: fixed;
+    top: 28px;
+    left: 28px;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.60);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    backdrop-filter: blur(14px);
+    color: #b45309;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 18px 10px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 4px 16px rgba(217, 119, 6, 0.10);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.85);
+    transform: translateX(-3px);
+    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.16);
+}
+
+.back-arrow {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+}
+
+.back-btn:hover .back-arrow {
+    transform: translateX(-3px);
+}
+
+/* ============================================================
+    ENVELOPE OVERLAY
+    Cobre a tela com animação de "fechar envelope" ao clicar em voltar
+   ============================================================ */
+.envelope-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Parte de cima do envelope (tampa triangular) */
+.envelope-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 55vh;
+    background: linear-gradient(160deg, #fef3c7, #fde68a);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform: translateY(-102%);
+    transform-origin: top center;
+}
+
+/* Corpo do envelope (sobe de baixo) */
+.envelope-body {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(180deg, #fffbeb, #fef3c7);
+    transform: translateY(102%);
+    box-shadow: 0 -12px 40px rgba(217, 119, 6, 0.15);
+}
+
+/* Linha decorativa de dobra no corpo */
+.envelope-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(217, 119, 6, 0.25), transparent);
+}
+
+/* Losango decorativo central */
+.envelope-body::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #fde68a, #fbbf24);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* ============================================================
+    ANIMAÇÃO DE FECHAR ENVELOPE
+    Tampa desce do topo, corpo sobe de baixo, simultâneos
+   ============================================================ */
+.envelope-overlay.closing {
+    pointer-events: all;
+}
+
+.envelope-overlay.closing .envelope-top {
+    animation: envelopeTopClose 0.7s 0.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.envelope-overlay.closing .envelope-body {
+    animation: envelopeBodyClose 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.envelope-overlay.closing .envelope-body::after {
+    opacity: 1;
+}
+
+@keyframes envelopeTopClose {
+    from { transform: translateY(-102%); }
+    to   { transform: translateY(0%); }
+}
+
+@keyframes envelopeBodyClose {
+    from { transform: translateY(102%); }
+    to   { transform: translateY(0%); }
+}

@@ -43,6 +43,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
+    <!-- Envelope overlay para voltar à landing -->
+    <div class="envelope-overlay" id="envelopeOverlay">
+        <div class="envelope-top"></div>
+        <div class="envelope-body"></div>
+    </div>
+
+    <!-- Botão de voltar -->
+    <button class="back-btn" id="backBtn" title="Voltar para início">
+        <svg class="back-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        <span>Início</span>
+    </button>
+
     <div class="login-container">
         <div class="login-card">
             <div class="logo-area">
@@ -79,5 +93,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="footer-text"> ShelfHub © 2026 </p>
         </div>
     </div> 
+    <script>
+        const backBtn = document.getElementById('backBtn');
+        const overlay = document.getElementById('envelopeOverlay');
+
+        backBtn.addEventListener('click', () => {
+            // Inicia animação de fechar envelope
+            overlay.classList.add('closing');
+
+            // Após fechar, redireciona
+            overlay.addEventListener('animationend', () => {
+                window.location.href = '/landing.php';
+            }, { once: true });
+        });
+    </script>
 </body>
 </html>
