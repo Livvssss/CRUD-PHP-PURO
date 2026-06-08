@@ -294,21 +294,35 @@ $authors = $stmt->fetchAll();
                     <?php foreach ($authors as $author): ?>
                         <div class="author-card">
 
-                            <div class="author-name" onclick="togglePhoto('foto<?= $author['id'] ?>')">
+                            <div class="author-name" onclick="toggleFoto(<?= $author['id'] ?>)">
                                 <?= htmlspecialchars($author['name']) ?>
                             </div>
 
                             <?php if ($author['photo']): ?>
+                                <!-- FIX: style="display:none" inline garante que cada foto começa oculta independentemente -->
                                 <img
-                                    id="foto<?= $author['id'] ?>"
+                                    id="foto-<?= $author['id'] ?>"
                                     src="uploads/authors/<?= htmlspecialchars($author['photo']) ?>"
                                     class="author-photo"
+                                    style="display:none"
                                     alt="Foto de <?= htmlspecialchars($author['name']) ?>">
                             <?php endif; ?>
 
-                            <div class="author-bio">
-                                <?= nl2br(htmlspecialchars($author['bio'])) ?>
+                            <!-- FIX: bio com wrapper colapsável -->
+                            <div class="author-bio-wrapper" id="bio-wrapper-<?= $author['id'] ?>">
+                                <div class="author-bio">
+                                    <?= nl2br(htmlspecialchars($author['bio'])) ?>
+                                </div>
                             </div>
+
+                            <!-- Botão "Ver mais" só aparece via JS se a bio for longa -->
+                            <button
+                                class="bio-toggle-btn"
+                                id="bio-btn-<?= $author['id'] ?>"
+                                onclick="toggleBio(<?= $author['id'] ?>)"
+                                style="display:none">
+                                Ver mais
+                            </button>
 
                             <a href="?editar=<?= $author['id'] ?>" class="edit-author-btn">Editar</a>
 
@@ -330,10 +344,51 @@ $authors = $stmt->fetchAll();
     </main>
 
     <script>
-        function togglePhoto(id) {
-            const foto = document.getElementById(id);
+        /* ── Toggle foto: cada card é independente ── */
+        function toggleFoto(id) {
+            const foto = document.getElementById('foto-' + id);
             if (!foto) return;
-            foto.style.display = foto.style.display === 'block' ? 'none' : 'block';
+            const visivel = foto.style.display === 'block';
+            foto.style.display = visivel ? 'none' : 'block';
+        }
+
+        /* ── Bio colapsável ── */
+        const BIO_MAX_HEIGHT = 80; // px visíveis quando colapsada
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.author-bio-wrapper').forEach(function (wrapper) {
+                const bio = wrapper.querySelector('.author-bio');
+                if (!bio) return;
+
+                // Extrai o id do wrapper (bio-wrapper-123 → 123)
+                const id = wrapper.id.replace('bio-wrapper-', '');
+                const btn = document.getElementById('bio-btn-' + id);
+
+                if (bio.scrollHeight > BIO_MAX_HEIGHT + 10) {
+                    // Bio longa: colapsa e exibe o botão
+                    wrapper.style.maxHeight = BIO_MAX_HEIGHT + 'px';
+                    wrapper.style.overflow  = 'hidden';
+                    if (btn) btn.style.display = 'block';
+                }
+            });
+        });
+
+        function toggleBio(id) {
+            const wrapper = document.getElementById('bio-wrapper-' + id);
+            const btn     = document.getElementById('bio-btn-'     + id);
+            if (!wrapper) return;
+
+            const colapsada = wrapper.style.maxHeight !== 'none' && wrapper.style.maxHeight !== '';
+
+            if (colapsada) {
+                wrapper.style.maxHeight = 'none';
+                wrapper.style.overflow  = 'visible';
+                if (btn) btn.textContent = 'Ver menos';
+            } else {
+                wrapper.style.maxHeight = BIO_MAX_HEIGHT + 'px';
+                wrapper.style.overflow  = 'hidden';
+                if (btn) btn.textContent = 'Ver mais';
+            }
         }
     </script>
 
