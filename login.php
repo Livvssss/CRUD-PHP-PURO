@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Após fechar, redireciona
             overlay.addEventListener('animationend', () => {
-                window.location.href = '/landing.php';
+                window.location.href = '/index.php';
             }, { once: true });
         });
     </script>

@@ -19,7 +19,7 @@ if (isset($_SESSION['usuario_id'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Estilos específicos desta página -->
-    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>
