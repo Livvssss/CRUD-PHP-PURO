@@ -1,70 +1,51 @@
 services:
-    php:
-        build:
-            context: .
-            dockerfile: docker/Dockerfile
+  php:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
 
-        container_name: biblioteca_php_puro
+    ports:
+      - "8090:80"
 
-        ports:
-            - "8090:80"
+    volumes:
+      - .:/var/www/html
 
-        volumes:
-            - ./:/var/www/html
+    environment:
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_NAME: ${MYSQL_DATABASE:-biblioteca_pw}
+      DB_USER: ${MYSQL_USER:-usuario_app}
+      DB_PASS: ${MYSQL_PASSWORD:-senha_app_123}
 
-        depends_on:
-            - mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+        required: true
 
-        networks:
-            - rede_biblioteca
+  mysql:
+    image: mysql:8.0
 
-    mysql:
-        image: mysql:8.0
+    restart: always
 
-        container_name: biblioteca_mysql_puro
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-senha_root_123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-biblioteca_pw}
+      MYSQL_USER: ${MYSQL_USER:-usuario_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-senha_app_123}
 
-        restart: always
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-        environment:
-            MYSQL_ROOT_PASSWORD: senha_root_123
-            MYSQL_DATABASE: biblioteca_pw
-            MYSQL_USER: usuario_app
-            MYSQL_PASSWORD: senha_app_123
+    volumes:
+      - dados_mysql:/var/lib/mysql
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
-        volumes:
-            - dados_mysql:/var/lib/mysql
-            - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
-
-        ports:
-            - "3308:3306"
-
-        networks:
-            - rede_biblioteca
-
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-
-        container_name: biblioteca_phpmyadmin_puro
-
-        restart: always
-
-        environment:
-            PMA_HOST: mysql
-            PMA_USER: root
-            PMA_PASSWORD: senha_root_123
-
-        ports:
-            - "8082:80"
-
-        depends_on:
-            - mysql
-
-        networks:
-            - rede_biblioteca
+    ports:
+      - "3308:3306"
 
 volumes:
-    dados_mysql:
-
-networks:
-    rede_biblioteca:
-        driver: bridge
+  dados_mysql:
