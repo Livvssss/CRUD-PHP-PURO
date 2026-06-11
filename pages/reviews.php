@@ -15,7 +15,7 @@ $usuarioNome = $_SESSION['usuario_nome'] ?? 'Usuário';
 $mensagem = '';
 $erro     = '';
 
-if (isset($_GET['atualizado'])) {
+if (isset($_POST['atualizado'])) {
     $mensagem = 'Review atualizada com sucesso!';
 }
 
@@ -86,9 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 /* ============================================================
     DELETE
    ============================================================ */
-if (isset($_GET['deletar'])) {
+if (isset($_POST['deletar'])) {
 
-    $reviewId = (int) $_GET['deletar'];
+    $reviewId = (int) $_POST['deletar'];
 
     $stmt = $pdo->prepare("
         DELETE FROM reviews
@@ -104,8 +104,8 @@ if (isset($_GET['deletar'])) {
     READ — review em edição (se houver)
    ============================================================ */
 $reviewEditando = null;
-if (isset($_GET['editar'])) {
-    $editarId = (int) $_GET['editar'];
+if (isset($_POST['editar'])) {
+    $editarId = (int) $_POST['editar'];
     $stmt = $pdo->prepare("
         SELECT * FROM reviews
         WHERE id = :id AND user_id = :user_id
@@ -299,8 +299,12 @@ $reviews = $stmt->fetchAll();
 
                         <div class="review-actions">
                             <a href="?editar=<?= $review['id'] ?>" class="edit-btn">Editar</a>
-                            <a href="?deletar=<?= $review['id'] ?>" class="delete-btn"
-                            onclick="return confirm('Deseja realmente excluir esta review?')">Excluir</a>
+                            <form method="POST" onsubmit="return confirm('Deseja realmente excluir esta review?')">
+    <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
+    <button type="submit" name="delete_review" class="delete-btn">
+        Excluir
+    </button>
+</form>
                         </div>
                     </div>
 

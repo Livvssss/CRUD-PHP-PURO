@@ -344,7 +344,7 @@ textarea {
     transition: var(--transition);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 4px;
     height: fit-content;
 }
 
@@ -443,7 +443,7 @@ textarea {
     background: var(--primary-soft);
     color: var(--primary);
     margin-top: auto;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .edit-author-btn:hover {

@@ -15,7 +15,7 @@ $usuarioNome = $_SESSION['usuario_nome'] ?? 'Usuário';
 $mensagem = '';
 $erro     = '';
 
-if (isset($_GET['atualizado'])) {
+if (isset($_POST['atualizado'])) {
     $mensagem = 'Post atualizado com sucesso!';
 }
 
@@ -81,9 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 /* ============================================================
     DELETE
    ============================================================ */
-if (isset($_GET['deletar'])) {
+if (isset($_POST['deletar'])) {
 
-    $postId = (int) $_GET['deletar'];
+    $postId = (int) $_POST['deletar'];
 
     $stmt = $pdo->prepare("
         DELETE FROM posts
@@ -99,8 +99,8 @@ if (isset($_GET['deletar'])) {
     READ — post em edição (se houver)
    ============================================================ */
 $postEditando = null;
-if (isset($_GET['editar'])) {
-    $editarId = (int) $_GET['editar'];
+if (isset($_POST['editar'])) {
+    $editarId = (int) $_POST['editar'];
     $stmt = $pdo->prepare("
         SELECT * FROM posts
         WHERE id = :id AND user_id = :user_id
