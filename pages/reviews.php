@@ -109,7 +109,7 @@ if (isset($_POST['deletar'])) {
     ");
     $stmt->execute([':id' => $reviewId, ':user_id' => $usuarioId]);
 
-    header('Location: reviews.php?deletado=1');
+    header('Location: reviews.php');
     exit();
 }
 
@@ -318,24 +318,26 @@ $reviews = $stmt->fetchAll();
                         </div>
 
                         <div class="review-actions">
-                            <div class="review-actions">
-                                <form method="POST">
-                                    <input type="hidden" name="editar" value="<?= $review['id'] ?>">
-                                    <button type="submit" class="edit-btn">
-                                        Editar
-                                    </button>
-                                </form>
-                            </div>
+
+                            <form method="POST">
+                                <input type="hidden" name="editar" value="<?= $review['id'] ?>">
+                                <button type="submit" class="edit-btn">
+                                    Editar
+                                </button>
+                            </form>
+
                             <form method="POST" onsubmit="return confirm('Deseja realmente excluir esta review?')">
                                 <input type="hidden" name="deletar" value="<?= $review['id'] ?>">
-                                <button type="submit" class="delete-btn">Excluir</button>
+                                <button type="submit" class="delete-btn">
+                                    Excluir
+                                </button>
                             </form>
-                        </div>
-                    </div>
 
+                        </div>
+
+                    </div>
+                <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
-        </div>
 
     </main>
 
@@ -343,8 +345,12 @@ $reviews = $stmt->fetchAll();
         document.querySelectorAll('.review-date[data-ts]').forEach(el => {
             const d = new Date(el.dataset.ts * 1000);
             el.textContent = d.toLocaleString('pt-BR', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', hour12: false
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
             });
         });
     </script>

@@ -258,8 +258,6 @@ textarea { min-height: 180px; resize: vertical; }
 
 .review-actions form {
     margin: 0;
-    padding: 0;
-    display: contents;
 }
 
 .edit-btn,
