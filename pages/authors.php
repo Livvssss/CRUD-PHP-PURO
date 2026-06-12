@@ -10,14 +10,22 @@ $usuarioId   = $_SESSION['usuario_id'];
 $usuarioNome = $_SESSION['usuario_nome'] ?? 'Usuário';
 $mensagem = '';
 $erro     = '';
+
+// CREATE
 if (isset($_GET['criado'])) {
-    $mensagem = 'Autor cadastrado com sucesso!';
+    $mensagem = '✅ Autor cadastrado com sucesso!';
 }
+// UPDATE
 if (isset($_GET['atualizado'])) {
-    $mensagem = 'Autor atualizado com sucesso!';
+    $mensagem = '✅ Autor atualizado com sucesso!';
 }
+// DELETE
 if (isset($_GET['deletado'])) {
-    $mensagem = 'Autor excluído com sucesso!';
+    $mensagem = '🗑️ Autor excluído com sucesso!';
+}
+// Erro de autor não encontrado (DELETE/UPDATE em id inválido)
+if (isset($_GET['nao_encontrado'])) {
+    $erro = '⚠️ Autor não encontrado ou sem permissão para esta ação.';
 }
 
 /* ============================================================
@@ -66,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
                 ':bio'     => $bio,
                 ':photo'   => $nomeFoto,
             ]);
-            header('Location: authors.php');
+            header('Location: authors.php?criado=1');
             exit();
         }
     }
@@ -124,7 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
                 ':user_id' => $usuarioId,
             ]);
         }
-        $mensagem = 'Autor atualizado com sucesso!';
+        header('Location: authors.php?atualizado=1');
+        exit();
     }
 }
 
@@ -151,8 +160,10 @@ if (isset($_POST['deletar'])) {
             WHERE id = :id AND user_id = :user_id
         ");
         $stmt->execute([':id' => $autorId, ':user_id' => $usuarioId]);
+        header('Location: authors.php?deletado=1');
+    } else {
+        header('Location: authors.php?nao_encontrado=1');
     }
-    header('Location: authors.php');
     exit();
 }
 
@@ -356,7 +367,7 @@ $authors = $stmt->fetchAll();
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <p class="empty">Nenhum autor cadastrado ainda.</p>
+                    <p class="empty">📚 Nenhum autor cadastrado ainda. Use o formulário ao lado para adicionar o primeiro!</p>
                 <?php endif; ?>
             </div>
 
