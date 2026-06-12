@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login.php');
+    header('Location: /index.php');
     exit();
 }
 require_once __DIR__ . '/../config/database.php';
@@ -10,8 +10,14 @@ $usuarioId   = $_SESSION['usuario_id'];
 $usuarioNome = $_SESSION['usuario_nome'] ?? 'Usuário';
 $mensagem = '';
 $erro     = '';
+if (isset($_GET['criado'])) {
+    $mensagem = 'Autor cadastrado com sucesso!';
+}
 if (isset($_GET['atualizado'])) {
     $mensagem = 'Autor atualizado com sucesso!';
+}
+if (isset($_GET['deletado'])) {
+    $mensagem = 'Autor excluído com sucesso!';
 }
 
 /* ============================================================
@@ -41,18 +47,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
     if (empty($nome) || empty($bio)) {
         $erro = 'Preencha todos os campos.';
     } else {
-        $nomeFoto = isset($_FILES['foto']) ? uploadFoto($_FILES['foto'], $pastaUploads) : null;
-        $stmt = $pdo->prepare("
-            INSERT INTO authors (user_id, name, bio, photo)
-            VALUES (:user_id, :name, :bio, :photo)
+        $stmtDup = $pdo->prepare("
+            SELECT COUNT(*) FROM authors
+            WHERE user_id = :user_id AND LOWER(name) = LOWER(:name)
         ");
-        $stmt->execute([
-            ':user_id' => $usuarioId,
-            ':name'    => $nome,
-            ':bio'     => $bio,
-            ':photo'   => $nomeFoto,
-        ]);
-        $mensagem = 'Autor cadastrado com sucesso!';
+        $stmtDup->execute([':user_id' => $usuarioId, ':name' => $nome]);
+        if ($stmtDup->fetchColumn() > 0) {
+            $erro = 'Já existe um autor com esse nome.';
+        } else {
+            $nomeFoto = isset($_FILES['foto']) ? uploadFoto($_FILES['foto'], $pastaUploads) : null;
+            $stmt = $pdo->prepare("
+                INSERT INTO authors (user_id, name, bio, photo)
+                VALUES (:user_id, :name, :bio, :photo)
+            ");
+            $stmt->execute([
+                ':user_id' => $usuarioId,
+                ':name'    => $nome,
+                ':bio'     => $bio,
+                ':photo'   => $nomeFoto,
+            ]);
+            header('Location: authors.php');
+            exit();
+        }
     }
 }
 
@@ -108,16 +124,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
                 ':user_id' => $usuarioId,
             ]);
         }
-        header('Location: authors.php?atualizado=1');
-        exit();
+        $mensagem = 'Autor atualizado com sucesso!';
     }
 }
 
 /* ============================================================
     DELETE
    ============================================================ */
-if (isset($_GET['deletar'])) {
-    $autorId = (int) $_GET['deletar'];
+if (isset($_POST['deletar'])) {
+    $autorId = (int) $_POST['deletar'];
     $stmt = $pdo->prepare("
         SELECT photo FROM authors
         WHERE id = :id AND user_id = :user_id
@@ -144,9 +159,9 @@ if (isset($_GET['deletar'])) {
 /* ============================================================
     READ - busca autor em edição (se houver) e lista todos
    ============================================================ */
-$autorEditando = null;
-if (isset($_GET['editar'])) {
-    $editarId = (int) $_GET['editar'];
+$autorEditando = $autorEditando ?? null;
+if (isset($_POST['editar'])) {
+    $editarId = (int) $_POST['editar'];
     $stmt = $pdo->prepare("
         SELECT * FROM authors
         WHERE id = :id AND user_id = :user_id
@@ -214,6 +229,10 @@ $authors = $stmt->fetchAll();
                 <?php if ($autorEditando): ?>
                     <!-- Formulário de edição -->
                     <h2 class="card-title">Editar Autor</h2>
+
+                    <?php if ($mensagem): ?>
+                        <div class="message"><?= htmlspecialchars($mensagem) ?></div>
+                    <?php endif; ?>
 
                     <?php if ($erro): ?>
                         <div class="error"><?= htmlspecialchars($erro) ?></div>
@@ -324,15 +343,16 @@ $authors = $stmt->fetchAll();
                                 Ver mais
                             </button>
 
-                            <a href="?editar=<?= $author['id'] ?>" class="edit-author-btn">Editar</a>
-
-                            <a
-                                href="?deletar=<?= $author['id'] ?>"
-                                class="delete-author-btn"
-                                onclick="return confirm('Deseja realmente excluir este autor?')">
-                                Excluir
-                            </a>
-
+                            <form method="POST">
+                                    <input type="hidden" name="editar" value="<?= $author['id'] ?>">
+                                    <button type="submit" class="edit-author-btn">
+                                        Editar
+                                    </button>
+                                </form>
+                            <form method="POST" onsubmit="return confirm('Deseja realmente excluir este autor?')">
+                                <input type="hidden" name="deletar" value="<?= $author['id'] ?>">
+                                <button type="submit" class="delete-author-btn">Excluir</button>
+                            </form>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>

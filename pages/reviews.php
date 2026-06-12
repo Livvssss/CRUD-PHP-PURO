@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login.php');
+    header('Location: /index.php');
     exit();
 }
 
@@ -15,9 +15,17 @@ $usuarioNome = $_SESSION['usuario_nome'] ?? 'Usuário';
 $mensagem = '';
 $erro     = '';
 
-if (isset($_POST['atualizado'])) {
-    $mensagem = 'Review atualizada com sucesso!';
+if (isset($_GET['deletado'])) {
+    $mensagem = 'Review excluída com sucesso!';
 }
+
+/* IDs dos livros que o usuário já resenhrou — deve vir antes do CREATE */
+$stmt = $pdo->prepare("
+    SELECT book_id FROM reviews
+    WHERE user_id = :user_id
+");
+$stmt->execute([':user_id' => $usuarioId]);
+$livrosJaResenhados = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 /* ============================================================
     CREATE
@@ -31,6 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
 
     if (empty($livroId) || empty($titulo) || empty($texto)) {
         $erro = 'Preencha todos os campos.';
+    } elseif (in_array($livroId, $livrosJaResenhados)) {
+        $erro = 'Você já escreveu uma review para este livro.';
     } else {
         $stmt = $pdo->prepare("
             INSERT INTO reviews (user_id, book_id, review_title, review_text, rating)
@@ -43,6 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
             ':review_text'  => $texto,
             ':rating'       => !empty($nota) ? $nota : null,
         ]);
+        // Recarrega lista para refletir o novo livro resenhado
+        $stmt = $pdo->prepare("SELECT book_id FROM reviews WHERE user_id = :user_id");
+        $stmt->execute([':user_id' => $usuarioId]);
+        $livrosJaResenhados = $stmt->fetchAll(PDO::FETCH_COLUMN);
         $mensagem = 'Review publicada com sucesso!';
     }
 }
@@ -78,8 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
             ':id'           => $reviewId,
             ':user_id'      => $usuarioId,
         ]);
-        header('Location: reviews.php?atualizado=1');
-        exit();
+        $mensagem = 'Review atualizada com sucesso!';
     }
 }
 
@@ -96,14 +109,14 @@ if (isset($_POST['deletar'])) {
     ");
     $stmt->execute([':id' => $reviewId, ':user_id' => $usuarioId]);
 
-    header('Location: reviews.php');
+    header('Location: reviews.php?deletado=1');
     exit();
 }
 
 /* ============================================================
     READ — review em edição (se houver)
    ============================================================ */
-$reviewEditando = null;
+$reviewEditando = $reviewEditando ?? null;
 if (isset($_POST['editar'])) {
     $editarId = (int) $_POST['editar'];
     $stmt = $pdo->prepare("
@@ -141,6 +154,7 @@ $reviews = $stmt->fetchAll();
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -186,12 +200,16 @@ $reviews = $stmt->fetchAll();
             <?php if ($reviewEditando): ?>
                 <h2 class="card-title">Editar Review</h2>
 
+                <?php if ($mensagem): ?>
+                    <div class="message"><?= htmlspecialchars($mensagem) ?></div>
+                <?php endif; ?>
+
                 <?php if ($erro): ?>
                     <div class="error"><?= htmlspecialchars($erro) ?></div>
                 <?php endif; ?>
 
                 <form method="POST">
-                    <input type="hidden" name="action"    value="update">
+                    <input type="hidden" name="action" value="update">
                     <input type="hidden" name="review_id" value="<?= $reviewEditando['id'] ?>">
 
                     <div class="form-group">
@@ -245,9 +263,11 @@ $reviews = $stmt->fetchAll();
                         <select name="livro_id">
                             <option value="">Selecione um livro</option>
                             <?php foreach ($books as $book): ?>
-                                <option value="<?= $book['id'] ?>">
-                                    <?= htmlspecialchars($book['title']) ?>
-                                </option>
+                                <?php if (!in_array($book['id'], $livrosJaResenhados)): ?>
+                                    <option value="<?= $book['id'] ?>">
+                                        <?= htmlspecialchars($book['title']) ?>
+                                    </option>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -293,18 +313,23 @@ $reviews = $stmt->fetchAll();
                             <div class="review-rating">⭐ <?= $review['rating'] ?>/5</div>
                         <?php endif; ?>
 
-                        <div class="review-date">
+                        <div class="review-date" data-ts="<?= strtotime($review['created_at']) ?>">
                             <?= date('d/m/Y H:i', strtotime($review['created_at'])) ?>
                         </div>
 
                         <div class="review-actions">
-                            <a href="?editar=<?= $review['id'] ?>" class="edit-btn">Editar</a>
+                            <div class="review-actions">
+                                <form method="POST">
+                                    <input type="hidden" name="editar" value="<?= $review['id'] ?>">
+                                    <button type="submit" class="edit-btn">
+                                        Editar
+                                    </button>
+                                </form>
+                            </div>
                             <form method="POST" onsubmit="return confirm('Deseja realmente excluir esta review?')">
-    <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
-    <button type="submit" name="delete_review" class="delete-btn">
-        Excluir
-    </button>
-</form>
+                                <input type="hidden" name="deletar" value="<?= $review['id'] ?>">
+                                <button type="submit" class="delete-btn">Excluir</button>
+                            </form>
                         </div>
                     </div>
 
@@ -313,5 +338,16 @@ $reviews = $stmt->fetchAll();
         </div>
 
     </main>
+
+    <script>
+        document.querySelectorAll('.review-date[data-ts]').forEach(el => {
+            const d = new Date(el.dataset.ts * 1000);
+            el.textContent = d.toLocaleString('pt-BR', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', hour12: false
+            });
+        });
+    </script>
 </body>
+
 </html>

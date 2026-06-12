@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login.php');
+    header('Location: /index.php');
     exit();
 }
 
@@ -33,36 +33,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cadastrar_livro'])) {
 
     } else {
 
-        $nomeCapa = null;
-
-        if (isset($_FILES['capa']) && $_FILES['capa']['error'] === 0) {
-
-            $pastaUploads = __DIR__ . '/uploads/books/';
-
-            if (!is_dir($pastaUploads)) {
-                mkdir($pastaUploads, 0777, true);
-            }
-
-            $extensao = pathinfo($_FILES['capa']['name'], PATHINFO_EXTENSION);
-            $nomeCapa = uniqid() . '.' . $extensao;
-
-            move_uploaded_file($_FILES['capa']['tmp_name'], $pastaUploads . $nomeCapa);
-        }
-
-        $stmt = $pdo->prepare("
-            INSERT INTO shelves (user_id, author_id, title, cover, release_date)
-            VALUES (:user_id, :author_id, :title, :cover, :release_date)
+        // Verifica se já existe um livro com o mesmo título para esse usuário
+        $stmtCheck = $pdo->prepare("
+            SELECT id
+            FROM shelves
+            WHERE user_id = :user_id
+            AND LOWER(title) = LOWER(:title)
+            LIMIT 1
         ");
 
-        $stmt->execute([
+        $stmtCheck->execute([
             ':user_id' => $usuarioId,
-            ':author_id' => $autor,
-            ':title' => $titulo,
-            ':cover' => $nomeCapa,
-            ':release_date' => $dataLancamento
+            ':title' => $titulo
         ]);
 
-        $mensagem = 'Livro adicionado à estante!';
+        if ($stmtCheck->fetch()) {
+
+            $erro = 'Esse livro já está na sua estante.';
+
+        } else {
+
+            $nomeCapa = null;
+
+            if (isset($_FILES['capa']) && $_FILES['capa']['error'] === 0) {
+
+                $pastaUploads = __DIR__ . '/uploads/books/';
+
+                if (!is_dir($pastaUploads)) {
+                    mkdir($pastaUploads, 0777, true);
+                }
+
+                $extensao = pathinfo($_FILES['capa']['name'], PATHINFO_EXTENSION);
+                $nomeCapa = uniqid() . '.' . $extensao;
+
+                move_uploaded_file($_FILES['capa']['tmp_name'], $pastaUploads . $nomeCapa);
+            }
+
+            $stmt = $pdo->prepare("
+                INSERT INTO shelves (user_id, author_id, title, cover, release_date)
+                VALUES (:user_id, :author_id, :title, :cover, :release_date)
+            ");
+
+            $stmt->execute([
+                ':user_id' => $usuarioId,
+                ':author_id' => $autor,
+                ':title' => $titulo,
+                ':cover' => $nomeCapa,
+                ':release_date' => $dataLancamento
+            ]);
+
+            $mensagem = 'Livro adicionado à estante!';
+        }
     }
 }
 

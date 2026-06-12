@@ -250,24 +250,33 @@ textarea { min-height: 180px; resize: vertical; }
 /* Botões de ação do card */
 .review-actions {
     display: flex;
+    align-items: center;
     gap: 8px;
     margin-top: 16px;
-    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.review-actions form {
+    margin: 0;
+    padding: 0;
+    display: contents;
 }
 
 .edit-btn,
 .delete-btn {
-    flex: 0;
-    display: inline-block;
-    padding: 8px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 20px;
+    border: none;
     border-radius: 12px;
+    font-family: inherit;
     font-weight: 600;
     font-size: 13px;
-    text-align: center;
-    text-decoration: none;
     cursor: pointer;
+    line-height: 1;
     transition: var(--transition);
-    border: none;
     white-space: nowrap;
 }
 

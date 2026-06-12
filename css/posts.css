@@ -387,6 +387,14 @@ textarea {
     display: flex;
     gap: 8px;
     margin-top: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.post-actions form {
+    margin: 0;
+    padding: 0;
+    display: contents;
 }
 
 .edit-btn,
