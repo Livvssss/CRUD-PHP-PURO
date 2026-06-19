@@ -13,19 +13,19 @@ $erro     = '';
 
 // CREATE
 if (isset($_GET['criado'])) {
-    $mensagem = '✅ Autor cadastrado com sucesso!';
+    $mensagem = 'Autor cadastrado com sucesso!';
 }
 // UPDATE
 if (isset($_GET['atualizado'])) {
-    $mensagem = '✅ Autor atualizado com sucesso!';
+    $mensagem = 'Autor atualizado com sucesso!';
 }
 // DELETE
 if (isset($_GET['deletado'])) {
-    $mensagem = '🗑️ Autor excluído com sucesso!';
+    $mensagem = 'Autor excluído com sucesso!';
 }
 // Erro de autor não encontrado (DELETE/UPDATE em id inválido)
 if (isset($_GET['nao_encontrado'])) {
-    $erro = '⚠️ Autor não encontrado ou sem permissão para esta ação.';
+    $erro = 'Autor não encontrado ou sem permissão para esta ação.';
 }
 
 /* ============================================================
@@ -45,6 +45,7 @@ function uploadFoto(array $arquivo, string $pasta): ?string
     return $nomeFoto;
 }
 $pastaUploads = __DIR__ . '/uploads/authors/';
+
 
 /* ============================================================
     CREATE
